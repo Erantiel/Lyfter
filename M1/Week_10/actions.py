@@ -8,7 +8,7 @@ def ask_for_grade(topic):
                 raise ValueError()
             return grade
         except ValueError as e:
-            print('\nTypo Error. Please a valid grade between 0 to 100.\n')
+            print('\nPlease enter a valid grade between 0 to 100.\n')
 
 
 def ask_for_name():
