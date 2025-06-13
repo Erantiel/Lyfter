@@ -13,13 +13,18 @@ def ask_for_grade(topic):
 
 def ask_for_name():
     loop = True
+    counter = 0
     while loop == True:
         name = input("\nType the student's name: ")
         for char in name:
-            if not char.isalpha():
-                print('\nPlease, enter a valid name for a student.')
+            if char.isalpha():
+                if counter == len(name):
+                    return name
+                else:
+                    counter += 1
+                    continue
             else:
-                return name
+                print('\nPlease, enter a valid name for a student.')
 
 
 def ask_for_classroom():
