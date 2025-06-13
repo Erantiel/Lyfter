@@ -17,7 +17,7 @@ def ask_for_name():
     while loop == True:
         name = input("\nType the student's name: ")
         for char in name:
-            if char.isalpha():
+            if char.isalpha() or char.isspace():
                 if counter == len(name)-1:
                     return name
                 else:
@@ -67,9 +67,9 @@ def average_note_every_student(list):
     for student in list_of_students:
         list_of_average_notes.append({'Name':student['Name'],'Average Grade':(int(student['Spanish Grade'])+int(student['English Grade'])+int(student['Social Studies Grade'])+int(student['Science Grade']))/4})
     sorted_list = sorted(list_of_average_notes, key=lambda item:item['Average Grade'], reverse=True)
+    print('\nThe top 3 students are:')
     for value in sorted_list:
         if counter < 3:
-            print('The top 3 students are:\n')
             print(value)
             counter += 1
 
