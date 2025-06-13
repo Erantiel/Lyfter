@@ -18,7 +18,7 @@ def ask_for_name():
         name = input("\nType the student's name: ")
         for char in name:
             if char.isalpha():
-                if counter == len(name):
+                if counter == len(name)-1:
                     return name
                 else:
                     counter += 1
