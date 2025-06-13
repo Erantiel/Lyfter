@@ -25,6 +25,7 @@ def ask_for_name():
                     continue
             else:
                 print('\nPlease, enter a valid name for a student.')
+                counter = 0
 
 
 def ask_for_classroom():
