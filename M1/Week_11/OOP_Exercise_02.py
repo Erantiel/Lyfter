@@ -20,7 +20,3 @@ person_02 = Person('Marco')
 bus_01 = Bus()
 passengers.append(bus_01.add_passenger(passengers,person_01))
 passengers.append(bus_01.add_passenger(passengers,person_02))
-
-print(passengers)
-# for index in range(0,len(passengers)):
-#     print(passengers[index].name)
