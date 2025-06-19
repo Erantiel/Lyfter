@@ -16,7 +16,7 @@ def main():
                 print('\nPlease, first import the file in order to read it.')
             else:
                 for student in student_list:
-                    print(f'{student}\n')
+                    print(f'\n{student}')
         elif option_selected == 3:
             if student_list == []:
                 print('\nPlease, first import the file in order to evaluate the top 3 students.')
@@ -31,9 +31,9 @@ def main():
             if student_list == []:
                 print('\nNo data to export. First add a student or import a file in order to export anything.')
             else:
-                data.write_csv_file('M1/Week_10/Students_Notes.csv',student_list)
+                data.write_csv_file('M1/Week_11/OOP_Exercise_03/Students_Notes.csv',student_list)
         elif option_selected == 6:
-            student_list = data.open_csv_file('M1/Week_10/Students_Notes.csv')
+            student_list = data.open_csv_file('M1/Week_11/OOP_Exercise_03/Students_Notes.csv')
         else:
             quit()
 

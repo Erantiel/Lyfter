@@ -1,3 +1,20 @@
+class Student():
+    def __init__(self,name,classroom,spanish_grade,english_grade,social_studies_grade,science_grade):
+        self.name = name
+        self.classroom = classroom
+        self.spanish_grade = spanish_grade
+        self.english_grade = english_grade
+        self.social_studies_grade = social_studies_grade
+        self.science_grade = science_grade
+
+
+    def __repr__(self):
+        return f'Name: {self.name}, Classroom: {self.classroom}, Spanish Grade: {self.spanish_grade}, English Grade: {self.english_grade}, Social Studies Grade: {self.social_studies_grade}, Science Grade: {self.science_grade}'
+
+
+    def __str__(self):
+        return f'Name: {self.name}, Classroom: {self.classroom}, Spanish Grade: {self.spanish_grade}, English Grade: {self.english_grade}, Social Studies Grade: {self.social_studies_grade}, Science Grade: {self.science_grade}'
+
 def ask_for_grade(topic):
     grade = 0
     loop = True
@@ -48,14 +65,14 @@ def ask_for_classroom():
 
 
 def add_student():
-    student = {
-        'Name':ask_for_name(),
-        'Classroom':ask_for_classroom(),
-        'Spanish Grade':ask_for_grade('Spanish'),
-        'English Grade':ask_for_grade('English'),
-        'Social Studies Grade':ask_for_grade('Social Studies'),
-        'Science Grade':ask_for_grade('Science')
-    }
+    student = Student(
+        ask_for_name(),
+        ask_for_classroom(),
+        ask_for_grade('Spanish'),
+        ask_for_grade('English'),
+        ask_for_grade('Social Studies'),
+        ask_for_grade('Science'),
+    )
     return student
 
 
@@ -65,7 +82,7 @@ def average_note_every_student(list):
     counter = 0
 
     for student in list_of_students:
-        list_of_average_notes.append({'Name':student['Name'],'Average Grade':(int(student['Spanish Grade'])+int(student['English Grade'])+int(student['Social Studies Grade'])+int(student['Science Grade']))/4})
+        list_of_average_notes.append({'Name':student.name,'Average Grade':(student.spanish_grade+student.english_grade+student.social_studies_grade+student.science_grade)/4})
     sorted_list = sorted(list_of_average_notes, key=lambda item:item['Average Grade'], reverse=True)
     print('\nThe top 3 students are:')
     for value in sorted_list:
@@ -80,7 +97,7 @@ def average_note_all_students(list):
     total_grades_number = 0
 
     for student in list_of_students:
-        total_average_note = total_average_note + (int(student['Spanish Grade'])+int(student['English Grade'])+int(student['Social Studies Grade'])+int(student['Science Grade']))
+        total_average_note = total_average_note + student.spanish_grade + student.english_grade + student.social_studies_grade + student.science_grade
         total_grades_number += 4
     
     total_average_note = total_average_note / total_grades_number
