@@ -14,21 +14,23 @@ class Person():
 class Bus():
     def __init__(self):
         self.max_passengers = 1
+        self.passengers = []
 
 
-    def add_passenger(self,passengers,person):
-        if len(passengers) >= self.max_passengers:
+    def add_passenger(self,person):
+        if len(self.passengers) >= self.max_passengers:
             print('The bus is full.')
         else:
-            return person
+            self.passengers.append(person)
+            return self.passengers
 
-passengers = []
 person_01 = Person('Luis')
 person_02 = Person('Marco')
 person_03 = Person('Karen')
+person_04 = Person('Ana')
 bus_01 = Bus()
-passengers.append(bus_01.add_passenger(passengers,person_01))
-passengers.append(bus_01.add_passenger(passengers,person_02))
-passengers.append(bus_01.add_passenger(passengers,person_03))
-
-print(passengers)
+bus_02 = Bus()
+print(bus_01.add_passenger(person_01))
+bus_01.add_passenger(person_02)
+print(bus_02.add_passenger(person_03))
+bus_02.add_passenger(person_04)
