@@ -24,13 +24,20 @@ class Bus():
             self.passengers.append(person)
             return self.passengers
 
+
+    def remove_passenger(self):
+        self.passengers.pop()
+        return self.passengers
+
 person_01 = Person('Luis')
 person_02 = Person('Marco')
 person_03 = Person('Karen')
 person_04 = Person('Ana')
 bus_01 = Bus()
 bus_02 = Bus()
+bus_02.max_passengers = 2
 print(bus_01.add_passenger(person_01))
 bus_01.add_passenger(person_02)
 print(bus_02.add_passenger(person_03))
-bus_02.add_passenger(person_04)
+print(bus_02.add_passenger(person_04))
+print(bus_02.remove_passenger())
