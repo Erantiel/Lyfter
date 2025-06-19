@@ -13,9 +13,8 @@ class Torso():
 
 
 class Arm():
-    def __init__(self, hand, torso):
+    def __init__(self, hand):
         self.hand
-        self.torso
 
 
 class Hand():
@@ -24,9 +23,8 @@ class Hand():
 
 
 class Leg():
-    def __init__(self, feet, torso):
+    def __init__(self, feet):
         self.feet
-        self.torso
 
 
 class Feet():
