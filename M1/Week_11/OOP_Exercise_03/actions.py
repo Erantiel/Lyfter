@@ -15,6 +15,7 @@ class Student():
     def __str__(self):
         return f'Name: {self.name}, Classroom: {self.classroom}, Spanish Grade: {self.spanish_grade}, English Grade: {self.english_grade}, Social Studies Grade: {self.social_studies_grade}, Science Grade: {self.science_grade}'
 
+
 def ask_for_grade(topic):
     grade = 0
     loop = True
@@ -52,7 +53,7 @@ def ask_for_classroom():
         number = classroom[0]
         letter = classroom[1]
 
-        if len(classroom) > 2:
+        if len(classroom) > 2 or len(classroom) < 1:
             print('\nPlease, enter a valid classroom: first a number followed by a letter.\n')
         elif number.isdigit():
             if letter.isalpha():

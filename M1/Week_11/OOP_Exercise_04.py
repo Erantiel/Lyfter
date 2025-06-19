@@ -1,0 +1,48 @@
+class Head():
+    def __init__(self, torso):
+        self.torso
+
+
+class Torso():
+    def __init__(self, head, right_arm, left_arm, left_leg, right_leg):
+        self.head = head
+        self.right_arm = right_arm
+        self.left_arm = left_arm
+        self.right_leg = right_leg
+        self.left_leg = left_leg
+
+
+class Arm():
+    def __init__(self, hand, torso):
+        self.hand
+        self.torso
+
+
+class Hand():
+    def __init__(self, arm):
+        self.arm
+
+
+class Leg():
+    def __init__(self, feet, torso):
+        self.feet
+        self.torso
+
+
+class Feet():
+    def __init__(self, leg):
+        self.leg
+
+
+class Human():
+    def __init__(self, head, torso, left_arm, right_arm, left_hand, right_hand, left_leg, right_leg, left_foot, right_foot):
+        self.head = head
+        self.torso = torso
+        self.left_arm = left_arm
+        self.left_hand = left_hand
+        self.right_arm = right_arm
+        self.right_hand = right_hand
+        self.left_leg = left_leg
+        self.left_foot = left_foot
+        self.right_leg = right_leg
+        self.right_foot = right_foot
