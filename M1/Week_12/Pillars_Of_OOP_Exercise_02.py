@@ -74,5 +74,4 @@ print(square.calculate_perimeter())
 print(square.calculate_area())
 
 print(rectangle.calculate_perimeter())
-print(rectangle.calculate_perimeter())
 print(rectangle.calculate_area())
