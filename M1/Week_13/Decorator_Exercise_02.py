@@ -1,17 +1,21 @@
 def check_numeric(func):
     def wrapper(*args):
+        result = func(*args)
+        counter = 0
         for index, arg in enumerate(args):
             try:
                 float(arg)
-                print(f'Arg: {index}, Number: {arg}')
+                result.append({f'Arg {counter}':f'Number {arg}'})
+                counter += 1
             except ValueError:
                 print(f'The input <{arg}> is not a number.')
-        func(*args)
+        return result
     return wrapper
 
 @check_numeric
-def arguments(argument_1, argument_2,argument_3):
-    pass
+def arguments(*args):
+    list_of_arg = []
+    return list_of_arg
 
-
-arguments(2,'H','4')
+result =arguments(2,'H','4')
+print(result)
