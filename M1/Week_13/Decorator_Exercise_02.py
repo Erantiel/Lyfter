@@ -8,8 +8,11 @@ def check_numeric(func):
                 print(f'The input <{arg}> is not a number.')
                 try:
                     result.pop(index)
-                    result = [int(item) for item in result]
                 except AttributeError:
+                    pass
+                try:
+                    result = [int(item) for item in result]
+                except ValueError:
                     pass
         return result
     return wrapper
