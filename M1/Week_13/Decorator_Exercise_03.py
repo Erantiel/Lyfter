@@ -6,22 +6,22 @@ class User:
 
 def is_adult(func):
     def wrapper(name, user):
-        func(name, user)
         try:
             age = int(user.age)
             if age < 18:
-                print(f'{name} is not an adult.\n')
+                return print(f'{name} is not an adult.\n')
             else:
-                print(f'{name} is an adult.\n')
+                func(name, user)
+                return print(f'{name} is an adult.\n')
         except TypeError:
-            print(f'The input <{user.age}> is not a valid age. Please, do not be dumb and type a valid age/number.')
+            return print(f'The input <{user.age}> is not a valid age. Please, do not be dumb and type a valid age/number.\n')
         except ValueError:
-            print(f'The input <{user.age}> is not a valid age. Please, do not be dumb and type a valid age/number.')
+            return print(f'The input <{user.age}> is not a valid age. Please, do not be dumb and type a valid age/number.\n')
     return wrapper
 
 @is_adult
 def set_name(name, user):
-    return print(f'The person {name} with date of birth {user.date_of_birth} is {user.age} years old.')
+    return print(f'The person {name} with date of birth {user.date_of_birth} is {user.age} years old.\n')
 
 
 user_01 = User('27/11/1996', 28)
