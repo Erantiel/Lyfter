@@ -17,5 +17,5 @@ def arguments(*args):
     list_of_arg = []
     return list_of_arg
 
-result =arguments(2,'H','4')
+result = arguments(2,'H','4')
 print(result)
