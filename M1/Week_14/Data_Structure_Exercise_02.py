@@ -11,10 +11,12 @@ class DoubleEndedQueue:
 
     def print_structure(self):
         current_node = self.head
-
-        while (current_node is not None):
-            print(current_node.data)
-            current_node = current_node.next
+        if current_node is not None:
+            while (current_node is not None):
+                print(current_node.data)
+                current_node = current_node.next
+        else:
+            print(current_node)
 
 
     def push_right(self, node):
