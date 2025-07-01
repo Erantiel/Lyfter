@@ -10,33 +10,24 @@ class Stack:
 
     def print_structure(self):
         current_node = self.head
-
-        while (current_node is not None):
-            print(current_node.data)
-            current_node = current_node.next
+        if current_node is not None:
+            while (current_node is not None):
+                print(current_node.data)
+                current_node = current_node.next
+        else:
+            print(current_node)
 
 
     def push(self, node):
-        current_node = self.head
-
-        while (current_node.next is not None):
-            current_node = current_node.next
-        
-        current_node.next = node
+        current_node = node
+        current_node.next = self.head
+        self.head = current_node
 
 
     def pop(self):
         current_node = self.head
-
-        while (current_node is not None):
-            top = current_node
-            current_node = current_node.next
-        
-        current_node = self.head
-        while (current_node.next != top):
-            current_node = current_node.next
-        
-        current_node.next = None
+        top = current_node.next
+        self.head = top
 
 
 forth_node = Node("Forth node")
@@ -50,13 +41,16 @@ structure.push(second_node)
 structure.push(third_node)
 structure.push(forth_node)
 structure.print_structure()
-print(f'---This is the top value: {forth_node.data}.---')
+print(f'---This is the First Value: {forth_node.data}.---')
 print('---Deleting from the Stack---')
 structure.pop()
 structure.print_structure()
 print('---Deleting One More---')
 structure.pop()
 structure.print_structure()
-print('---Reaching the Head Value---')
+print('---Reaching the Last Value---')
+structure.pop()
+structure.print_structure()
+print('---No more values---')
 structure.pop()
 structure.print_structure()

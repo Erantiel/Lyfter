@@ -38,8 +38,8 @@ class BinaryTree:
 
     def post_order_print(self, start, traversal):
         if start:
-            traversal = self.in_order_print(start.left, traversal)
-            traversal = self.in_order_print(start.right, traversal)
+            traversal = self.post_order_print(start.left, traversal)
+            traversal = self.post_order_print(start.right, traversal)
             traversal += (str(start.data) + " ")
         return traversal
 
