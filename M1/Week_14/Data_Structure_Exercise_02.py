@@ -6,7 +6,7 @@ class Node:
 class DoubleEndedQueue:
     def __init__(self, head):
         self.head = head
-        self.tail = None
+        self.tail = head
 
 
     def print_structure(self):
@@ -20,12 +20,8 @@ class DoubleEndedQueue:
 
 
     def push_right(self, node):
-        current_node = self.head
-
-        while (current_node.next is not None):
-            current_node = current_node.next
-        
-        current_node.next = node
+        self.tail.next = node
+        self.tail = node
 
 
     def push_left(self, node):
