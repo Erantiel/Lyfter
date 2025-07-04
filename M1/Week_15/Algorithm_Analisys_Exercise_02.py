@@ -14,7 +14,7 @@ def check_if_lists_have_an_equal(list_a, list_b): #O(n^2)
 
 def print_10_or_less_elements(list_to_print): #O(log N)
 	list_len = len(list_to_print) #O(1)
-	for index in range(min(list_len, 10)): #O(log N)
+	for index in range(min(list_len, 10)): #O(n)
 		print(list_to_print[index]) #O(1)
 
 
