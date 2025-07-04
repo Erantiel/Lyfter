@@ -1,45 +1,32 @@
 class Node:
-    def __init__(self, data):
+    data: str
+    next: float
+
+    def __init__(self, data, next=None):
         self.data = data
-        self.next = None
+        self.next = next
 
-class Stack:
+
+class LinkedList:
     def __init__(self, head):
-        self.head = head
-        self.size = 0
-
+            self.head = head
+            self.size = 2
 
     def print_structure(self):
         current_node = self.head
-        if current_node is not None:
-            while (current_node is not None):
-                print(current_node.data)
-                current_node = current_node.next
-        else:
-            print(current_node)
+            
+        while (current_node is not None):
+            print(current_node.data)
+            current_node = current_node.next
 
-
-    def push(self, node):
-        current_node = node
-        current_node.next = self.head
-        self.head = current_node
-        self.size += 1
-
-
-    def pop(self):
-        current_node = self.head
-        top = current_node.next
-        self.head = top
-
-
-    def bubble_sort(self, last_node):
+    def bubble_sort(self):
         for index in range(0, self.size):
-            node = last_node
+            node = self.head
             changes = False
             for position in range(0, self.size - index):
                 node_current = node.data
                 node_next = node.next.data
-                if node.data < node.next.data:
+                if node.data > node.next.data:
                     node.data = node_next
                     node.next.data = node_current
                     changes = True
@@ -48,16 +35,12 @@ class Stack:
             return
 
 
-forth_node = Node(56)
-third_node = Node(2)
-second_node = Node(21)
-first_node = Node(78)
+third_node = Node(15)
+second_node = Node(-12, third_node)
+first_node = Node(76, second_node)
 
-structure = Stack(first_node)
-structure.push(second_node)
-structure.push(third_node)
-structure.push(forth_node)
+structure = LinkedList(first_node)
 structure.print_structure()
-structure.bubble_sort(forth_node)
-print('Sorting the stack...')
+print('Sorting the Linked List...')
+structure.bubble_sort()
 structure.print_structure()
