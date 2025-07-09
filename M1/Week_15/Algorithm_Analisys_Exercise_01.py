@@ -1,0 +1,20 @@
+def bubble_sort(list): #O(n^2)
+    for index in range(0, len(list) - 1): #O(n)
+        changes = False #O(1)
+        for position in range(0, len(list) - 1 - index): #O(n^2)
+            current_element = list[position] #O(1)
+            next_element = list[position + 1] #O(1)
+
+            if current_element > next_element: #O(1)
+                list[position] = next_element #O(1)
+                list[position + 1] = current_element #O(1)
+                changes = True #O(1)
+    if not changes: #O(1)
+        return #O(1)
+
+
+list_a = [71, -34, 11, 1, 110, 45, -12] #O(1)
+print(list_a) #O(1)
+bubble_sort(list_a) #O(n^2)
+print('Sorting list...') #O(1)
+print(list_a) #O(1)
