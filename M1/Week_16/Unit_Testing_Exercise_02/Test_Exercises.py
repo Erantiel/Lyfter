@@ -109,7 +109,7 @@ def test_ex_06_order_words_alphabetically_using_hyphen_with_special_characters()
     assert result == '?-Animal-Zac'
 
 
-def test_ex_07_number_is_prime_number_is_neither_prime_nor_composite():
+def test_ex_07_number_is_prime_number_1_is_neither_prime_nor_composite():
     # Arrange
     list_of_numbers = [1,2,3]
     # Act
