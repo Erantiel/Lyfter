@@ -28,7 +28,6 @@ def add_category():
     layout = [
         [gui.Text('Type a cetegory:'), gui.Input(key='category'), gui.Button('Add'), gui.Button('Cancel')],
     ]
-
     window = gui.Window('Category', layout)
 
     while True:
@@ -36,8 +35,10 @@ def add_category():
         if event == gui.WIN_CLOSED:
             break
         elif event == 'Add':
-            if values['category'] != '':
-                con.create_category_file(values['category'])
+            category = values['category'].strip()
+            if category != '':
+                con.create_category_file(category)
+                gui.popup(f'"{category}" category created!')
                 window.close()
             else:
                 gui.popup('First, type a category in order to continue.',title='Error')
@@ -63,16 +64,22 @@ def add_purchase():
             if event == gui.WIN_CLOSED:
                 break
             elif event == 'Add':
-                if not values['description'] or not values['amount']:
+                description = values['description'].strip()
+                amount = values['amount'].strip()
+                if not description or not values:
                     gui.popup('Please make sure to fill the empty inputs before submiting.', title='Error')
                 else:
                     try:
-                        float(values['amount'])
-                        object = con.add_financial_flow('Purchase', values['category'], values['description'], values['amount'])
-                        con.create_financial_flow_file(object)
-                        window.close()
+                        amount_number = float(amount)
+                        if amount_number < 1:
+                            gui.popup('The amount cannot be less than 1.')
+                        else:
+                            object = con.add_financial_flow('Purchase', values['category'], description, amount_number)
+                            con.create_financial_flow_file(object)
+                            gui.popup('Purchase added!')
+                            window.close()
                     except ValueError:
-                        gui.popup('The amount purchase can only contain numbers.', title='Error')  
+                        gui.popup('The purchase amount can only contain numbers.', title='Error')  
             elif event == 'Cancel':
                 window.close()
         window.close()
@@ -97,14 +104,20 @@ def add_income():
             if event == gui.WIN_CLOSED:
                 break
             elif event == 'Add':
-                if not values['description'] or not values['amount']:
+                description = values['description'].strip()
+                amount = values['amount'].strip()
+                if not description or not values:
                     gui.popup('Please make sure to fill the empty inputs before submiting.', title='Error')
                 else:
                     try:
-                        float(values['amount'])
-                        object = con.add_financial_flow('Income', values['category'], values['description'], values['amount'])
-                        con.create_financial_flow_file(object)
-                        window.close()
+                        amount_number = float(amount)
+                        if amount_number < 1:
+                            gui.popup('The amount cannot be less than 1.')
+                        else:
+                            object = con.add_financial_flow('Income', values['category'], description, amount_number)
+                            con.create_financial_flow_file(object)
+                            gui.popup('Income Added!')
+                            window.close()
                     except ValueError:
                         gui.popup('The income can only contain numbers', title='Error')  
             elif event == 'Cancel':
@@ -119,12 +132,11 @@ def movements():
     if data == FileNotFoundError:
         gui.popup('A purchase or income has to be added first before displaying the information.', title='Error')
     else:
-        headings = data[0]
         values = data[1:]
 
         layout = [
             [gui.Table(values=values, 
-                    headings=headings,
+                    headings=['Type','Category','Description','Amount'],
                     max_col_width=35,
                     auto_size_columns=True,
                     display_row_numbers=True,

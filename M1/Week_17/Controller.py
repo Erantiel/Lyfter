@@ -1,14 +1,17 @@
 import Model as mod
 import csv
+import os
 
 def create_category_file(category):
-    with open('M1/Week_17/List_of_categories.txt', 'a') as file:
+    if not os.path.isdir('Data'):
+        os.makedirs('Data')
+    with open('Data/List_of_categories.txt', 'a') as file:
         file.write(f'{category}\n')
 
 
 def open_category_file():
     try:
-        with open('M1/Week_17/List_of_categories.txt', 'r') as file:
+        with open('Data/List_of_categories.txt', 'r') as file:
             list = []
             for line in file.readlines():
                 list.append(line.replace('\n',''))
@@ -35,12 +38,12 @@ def create_financial_flow_file(object):
     headers = ['Type', 'Category', 'Description', 'Amount']
     list = [{'Type':object.type, 'Category':object.category, 'Description':object.description, 'Amount':object.amount}]
     try:
-        with open('M1/Week_17/Financial_Flow.csv', 'r') as csvfile:
-            with open('M1/Week_17/Financial_Flow.csv', 'a', newline='', encoding='utf-8') as csvfile:
+        with open('Data/Financial_Flow.csv', 'r') as csvfile:
+            with open('Data/Financial_Flow.csv', 'a', newline='', encoding='utf-8') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=headers)
                 writer.writerows(list)
     except FileNotFoundError:
-        with open('M1/Week_17/Financial_Flow.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        with open('Data/Financial_Flow.csv', 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=headers)
             writer.writeheader()
             writer.writerows(list)
@@ -49,7 +52,7 @@ def create_financial_flow_file(object):
 def open_financial_flow_file():
     data = []
     try:
-        with open('M1/Week_17/Financial_Flow.csv', 'r', newline='', encoding='utf-8') as file:
+        with open('Data/Financial_Flow.csv', 'r', newline='', encoding='utf-8') as file:
                 reader = csv.reader(file)
                 for row in reader:
                     data.append(row)
