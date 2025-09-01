@@ -9,29 +9,27 @@ def validate_keys(data):
         raise ValueError("status key is missing from the dictionary.")
 
 
-def validate_id(id_dic, tasks):
-    for task in tasks:
-        for key,value in task.items():
-            if id_dic == value:
-                raise ValueError("The id already exists. Type a new one.")
-    if id_dic == "":
-        raise ValueError("The id cannot be empty")
-
-
-def validate_title(data):
+def validate_data(id_dic, tasks, data):
+    if id_dic != "":
+        for task in tasks:
+            for key,value in task.items():
+                if id_dic == value:
+                    raise ValueError("The id already exists. Type a new one.")
+        if id_dic == "":
+            raise ValueError("The id cannot be empty")
+    
+    
     if data["title"] == "":
         raise ValueError("The title cannot be empty")
-
-
-def validate_description(data):
+    
+    
     if data["description"] == "":
-        raise ValueError("The description cannot be empty")    
-
-
-def validate_status(data):
+        raise ValueError("The description cannot be empty")
+    
+    
     if data["status"] == "":
         raise ValueError("The status cannot be empty")
     elif data["status"] == "Pending" or data["status"] == "Ongoing" or data["status"] == "Completed":
         pass
     else:
-        raise ValueError("The status can only be: 'Pending', 'Ongoing' or 'Completed'")
+        raise ValueError("The status can only be: 'Pending', 'Ongoing' or 'Completed'")     
