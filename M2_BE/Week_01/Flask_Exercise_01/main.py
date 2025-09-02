@@ -17,7 +17,7 @@ def get_tasks():
     tasks = files.open_json()
     status_filter = request.args.get("status")
     if tasks == []:
-        return jsonify({"error":"No tasks has been created yet."}), 404
+        return jsonify({"error":"No tasks has been created yet."}), 200
     elif not status_filter:
         return tasks, 200
     elif status_filter == "Completed" or status_filter == "Pending" or status_filter == "Ongoing":
@@ -25,11 +25,11 @@ def get_tasks():
             task for task in tasks if task["status"] == status_filter
             ]
         if filtered_tasks == []:
-            return jsonify({"error":"No tasks with the current status exists."}), 404
+            return jsonify({"error":"No tasks with the current status exists."}), 200
         else:
             return jsonify({"response":f"Tasks filtered by status '{status_filter}':{filtered_tasks}"}), 200
     else:
-        return jsonify({"error":"This method only accepts Completed, Pending or Ongoing as status"}), 400
+        return jsonify({"error":"This method only accepts Completed, Pending or Ongoing as status"}), 404
 
 
 @app.route("/tasks", methods=["POST"])
@@ -41,12 +41,7 @@ def post_task():
 
         validations.validate_data(data["id"], tasks, data)
         
-        tasks.append({
-            "id":data["id"],
-            "title":data["title"],
-            "description":data["description"],
-            "status":data["status"]
-        })
+        tasks.append(validations.data_structure(data))
         files.create_json(tasks)
         return jsonify({"response":tasks}), 201
     except ValueError as ex:
@@ -67,10 +62,8 @@ def update_task(task_id):
             if task_id == value["id"]:
                 if not "id" in data:
                     validations.validate_data("", tasks, data)
-                    tasks[counter]["id"] = task_id
-                    tasks[counter]["title"] = data["title"]
-                    tasks[counter]["description"] = data["description"]
-                    tasks[counter]["status"] = data["status"]
+                    data["id"] = task_id
+                    tasks[counter] = validations.data_structure(data)
                     files.create_json(tasks)
                     return tasks, 200
                 else:

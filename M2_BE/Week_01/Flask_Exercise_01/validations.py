@@ -9,6 +9,15 @@ def validate_keys(data):
         raise ValueError("status key is missing from the dictionary.")
 
 
+def data_structure(data):
+    for key in data:
+        if key == "id" or key == "title" or key == "description" or key == "status":
+            pass
+        else:
+            raise ValueError("The body can only contain the following keys: id, title, description and status.")
+    return data
+
+
 def validate_data(id_dic, tasks, data):
     if id_dic != "":
         for task in tasks:
