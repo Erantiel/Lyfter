@@ -17,7 +17,7 @@ def get_tasks():
     tasks = files.open_json()
     status_filter = request.args.get("status")
     if tasks == []:
-        return jsonify({"error":"No tasks has been created yet."}), 200
+        return jsonify([]), 200
     elif not status_filter:
         return tasks, 200
     elif status_filter == "Completed" or status_filter == "Pending" or status_filter == "Ongoing":
@@ -90,7 +90,7 @@ def delete_task(task_id):
             if task_id == value["id"]:
                 del tasks[counter]
                 files.create_json(tasks)
-                return jsonify({"response":"Sucesfull deletion."}), 204
+                return 204
             elif counter+1 == len(tasks):
                 return jsonify({"error":"The id does not exist."}), 404
             else:
