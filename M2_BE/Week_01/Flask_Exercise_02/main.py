@@ -11,7 +11,7 @@ user = {"username":"admin","password":"1234"}
 token = {}
 
 def check_token(func):
-    def wrapper(*args):
+    def wrapper(*args,**kwargs):
         header_token = request.headers.get("Authorization", "")
         if not header_token.startswith("Bearer "):
             return jsonify({"error":"Incorrect header format. Try: Authorization: Bearer token"}), 401
@@ -20,7 +20,7 @@ def check_token(func):
 
         if token["value"] != received_token:
             return jsonify({"error":"Invalid token"}), 401
-        return func(*args)
+        return func(*args,**kwargs)
     
     return wrapper
 
