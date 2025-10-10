@@ -14,7 +14,7 @@ def check_token(func):
     def wrapper(*args,**kwargs):
         header_token = request.headers.get("Authorization", "")
         if not header_token.startswith("Bearer "):
-            return jsonify({"error":"Incorrect header format. Try: Authorization: Bearer token"}), 401
+            return jsonify({"error":"Incorrect header format. Try: Authorization: Bearer <token>"}), 401
         
         received_token = header_token.split(" ")[1]
 
@@ -25,19 +25,19 @@ def check_token(func):
     return wrapper
 
 
-@app.route("/login", methods=["POST"])
-def login():
-    global token
-    data = request.get_json()
-    username = data.get("username")
-    password = data.get("password")
+class Authetication(MethodView):
+    def post(self):
+        global token
+        data = request.get_json()
+        username = data.get("username")
+        password = data.get("password")
 
-    if user["username"] != username or user["password"] != password:
-        return jsonify({"error":"Invalid credentials"}), 401
-    
-    generated_token = secrets.token_hex(16)
-    token["value"] = generated_token
-    return jsonify({"token":generated_token}), 200
+        if user["username"] != username or user["password"] != password:
+            return jsonify({"error":"Invalid credentials"}), 401
+        
+        generated_token = secrets.token_hex(16)
+        token["value"] = generated_token
+        return jsonify({"token":generated_token}), 200
 
 
 class Tasks(MethodView):
@@ -132,9 +132,11 @@ class Tasks(MethodView):
 
 
 task_view = Tasks.as_view("tasks_api")
+auth_view = Authetication.as_view("auth_api")
 
 app.add_url_rule("/task", methods=["GET", "POST"], view_func=task_view)
 app.add_url_rule("/task/<task_id>", methods=["PUT", "DELETE"], view_func=task_view)
+app.add_url_rule("/login", methods=["POST"], view_func=auth_view)
 
 
 if __name__ == "__main__":
