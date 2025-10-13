@@ -1,0 +1,104 @@
+from flask import Flask, jsonify, request
+import validations
+import files
+
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def root():
+    pass
+
+
+@app.route("/tasks", methods=["GET"])
+def get_tasks():
+    tasks = []
+    tasks = files.open_json()
+    status_filter = request.args.get("status")
+    if tasks == []:
+        return jsonify([]), 200
+    elif not status_filter:
+        return tasks, 200
+    elif status_filter == "Completed" or status_filter == "Pending" or status_filter == "Ongoing":
+        filtered_tasks = [
+            task for task in tasks if task["status"] == status_filter
+            ]
+        if filtered_tasks == []:
+            return jsonify({"error":"No tasks with the current status exists."}), 200
+        else:
+            return jsonify({"response":f"Tasks filtered by status '{status_filter}':{filtered_tasks}"}), 200
+    else:
+        return jsonify({"error":"This method only accepts Completed, Pending or Ongoing as status"}), 404
+
+
+@app.route("/tasks", methods=["POST"])
+def post_task():
+    try:
+        tasks = []
+        tasks = files.open_json()
+        data = request.json
+
+        validations.validate_data(data["id"], tasks, data)
+        
+        tasks.append(validations.data_structure(data))
+        files.create_json(tasks)
+        return jsonify({"response":tasks}), 201
+    except ValueError as ex:
+        return jsonify({"error":str(ex)}), 400
+
+
+@app.route("/tasks/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    try:
+        tasks = []
+        tasks = files.open_json()
+        data = request.json
+        counter = 0
+        
+        if tasks == []:
+            return jsonify({"error":"No tasks has been created yet."})
+        for value in tasks:
+            if task_id == value["id"]:
+                if not "id" in data:
+                    validations.validate_data("", tasks, data)
+                    data["id"] = task_id
+                    tasks[counter] = validations.data_structure(data)
+                    files.create_json(tasks)
+                    return tasks, 200
+                else:
+                    return jsonify({"error":"Do not include the id in the body when updating the task."}), 400
+            elif counter+1 == len(tasks):
+                return jsonify({"error":"The id does not exist."}), 404
+            else:
+                counter += 1
+                pass
+    except ValueError as ex:
+        return jsonify({"error":str(ex)}), 400
+
+
+@app.route("/tasks/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    try:
+        tasks = []
+        tasks = files.open_json()
+        counter = 0
+        
+        if tasks == []:
+            return jsonify({"error":"No tasks has been created yet."}), 400
+        for value in tasks:
+            if task_id == value["id"]:
+                del tasks[counter]
+                files.create_json(tasks)
+                return 204
+            elif counter+1 == len(tasks):
+                return jsonify({"error":"The id does not exist."}), 404
+            else:
+                counter += 1
+                pass
+    except ValueError as ex:
+        return jsonify({"error":str(ex)}), 400
+
+
+if __name__ == "__main__":
+    app.run(host="localhost", debug=True)
