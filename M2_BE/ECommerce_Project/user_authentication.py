@@ -31,6 +31,7 @@ auth_view = Authetication.as_view("auth_api")
 
 app.add_url_rule("/user", methods=["GET", "POST", "PUT", "DELETE"], view_func=user_view)
 app.add_url_rule("/login", methods=["POST"], view_func=auth_view)
+app.add_url_rule("/register", methods=["POST"], view_func=auth_view)
 
 
 if __name__ == "__main__":
