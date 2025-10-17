@@ -22,7 +22,6 @@ def check_token(func):
             return jsonify({"error":"Invalid token"}), 401
         return func(*args,**kwargs)
     
-    return wrapper
 
 
 class Authetication(MethodView):
@@ -87,7 +86,7 @@ class Tasks(MethodView):
             counter = 0
             
             if tasks == []:
-                return jsonify({"error":"No tasks has been created yet."})
+                return jsonify({"error":"No tasks has been created yet."}), 400
             for value in tasks:
                 if task_id == value["id"]:
                     if not "id" in data:
