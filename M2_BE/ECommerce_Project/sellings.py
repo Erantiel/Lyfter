@@ -2,9 +2,6 @@ from flask import Flask, jsonify, request
 from flask.views import MethodView
 import files
 
-
-app = Flask(__name__)
-
 class Sellings(MethodView):
     def get(self):
         sellings = []
@@ -54,6 +51,7 @@ class Sellings(MethodView):
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
 
+
     def delete(self, selling_id):
         try:
             sellings = []
@@ -76,10 +74,4 @@ class Sellings(MethodView):
             return jsonify({"error":str(ex)}), 400
 
 
-
 sellings_view = Sellings.as_view("sellings_api")
-
-app.add_url_rule("/sellings", methods=["GET", "POST"], view_func=sellings_view)
-app.add_url_rule("/sellings/<selling_id>", methods=["PUT", "DELETE"], view_func=sellings_view)
-
-app.run(host="localhost", debug=True)

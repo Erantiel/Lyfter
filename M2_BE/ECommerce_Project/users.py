@@ -3,8 +3,6 @@ from flask.views import MethodView
 import files
 
 
-app = Flask(__name__)
-
 class Authetication(MethodView):
     def post(self):
         pass
@@ -59,6 +57,7 @@ class Users(MethodView):
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
 
+
     def delete(self, user_id):
         try:
             users = []
@@ -81,13 +80,5 @@ class Users(MethodView):
             return jsonify({"error":str(ex)}), 400
 
 
-
 users_view = Users.as_view("users_api")
 auth_view = Authetication.as_view("auth_api")
-
-app.add_url_rule("/user", methods=["GET", "POST"], view_func=users_view)
-app.add_url_rule("/user/<user_id>", methods=["PUT", "DELETE"], view_func=users_view)
-app.add_url_rule("/login", methods=["POST"], view_func=auth_view)
-app.add_url_rule("/register", methods=["POST"], view_func=auth_view)
-
-app.run(host="localhost", debug=True)

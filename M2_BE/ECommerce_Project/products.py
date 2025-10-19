@@ -3,8 +3,6 @@ from flask.views import MethodView
 import files
 
 
-app = Flask(__name__)
-
 class Products(MethodView):
     def get(self):
         products = []
@@ -78,7 +76,3 @@ class Products(MethodView):
 
 
 products_view = Products.as_view("products_api")
-app.add_url_rule("/products", methods=["GET", "POST"], view_func=products_view)
-app.add_url_rule("/products/<product_id>", methods=["PUT", "DELETE"], view_func=products_view)
-
-app.run(host="localhost", debug=True)
