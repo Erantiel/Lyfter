@@ -1,0 +1,88 @@
+-- Tables
+---------- Excerise Step: 2 (Create Tables) ↓ --------
+-- CREATE TABLE bills (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     purchase_date TEXT NOT NULL,
+--     customer_email VARCHAR(50) NOT NULL,
+--     total_amount SMALLINT DEFAULT 0
+-- );
+-- CREATE TABLE products (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     name VARCHAR(25) NOT NULL,
+--     price INT DEFAULT 0,
+--     date_of_admission TEXT NOT NULL,
+--     brand VARCHAR(50) NOT NULL
+-- );
+-- CREATE TABLE bill_product (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     bill_id INT REFERENCES bills(id),
+--     product_id INT REFERENCES products(id),
+--     product_amount SMALLINT DEFAULT 0,
+--     total_amount SMALLINT DEFAULT 0
+-- );
+-- CREATE TABLE shopping_cart (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     customer_email VARCHAR(50) NOT NULL,
+--     product_id INT REFERENCES products(id)
+-- );
+-- CREATE TABLE product_shopping_cart (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     product_id INT REFERENCES products(id)
+--     shopping_cart_id REFERENCES shopping_cart(id)
+-- );
+-------- Excerise Step: 3 (Modify Tables) ↓ --------
+-- ALTER TABLE bills
+--     ADD customer_phone_number INT NOT NULL DEFAULT 0;
+-- ALTER TABLE bills
+--     ADD seller_id INT NOT NULL DEFAULT 0;
+-------- Excerise Step: Extra (Insert info) ↓ --------
+-------- Insert products
+-- INSERT INTO products (name, price, date_of_admission, brand)
+--     VALUES ("Xbox Controller", 30000, "08/23/25", "Microsoft");
+-- INSERT INTO products (name, price, date_of_admission, brand)
+--     VALUES ("Xbox One", 250000, "07/11/24", "Microsoft");
+-- INSERT INTO products (name, price, date_of_admission, brand)
+--     VALUES ("Power Bank", 15000, "01/05/24", "Anker");
+-------- Insert bills
+-- INSERT INTO bills (purchase_date, customer_email, total_amount)
+--     VALUES ("05/20/25", "mario072@gmail.com", 75000);--1 Xbox Controller and 3 Power Banks
+-- INSERT INTO bills (purchase_date, customer_email, total_amount)
+--     VALUES ("06/01/25", "mario072@gmail.com", 30000);--1 Xbox Controller
+-- INSERT INTO bills (purchase_date, customer_email, total_amount)
+--     VALUES ("08/24/25", "ana111@hotmail.com", 340000);--3 Xbox Controller and 1 Xbox One
+-- INSERT INTO bills (purchase_date, customer_email, total_amount)
+--     VALUES ("03/15/24", "luis009@yahoo.com", 15000);--1 Power Bank
+-------- Fill bill_product
+-- INSERT INTO bill_product(bill_id, product_id, product_amount, total_amount)
+--     VALUES(1, 1, 1, 30000);
+-- INSERT INTO bill_product(bill_id, product_id, product_amount, total_amount)
+--     VALUES(1, 3, 3, 45000);
+-- INSERT INTO bill_product(bill_id, product_id, product_amount, total_amount)
+--     VALUES(2, 1, 1, 30000);
+-- INSERT INTO bill_product(bill_id, product_id, product_amount, total_amount)
+--     VALUES(3, 1, 3, 90000);
+-- INSERT INTO bill_product(bill_id, product_id, product_amount, total_amount)
+--     VALUES(3, 2, 1, 250000);
+-- INSERT INTO bill_product(bill_id, product_id, product_amount, total_amount)
+--     VALUES(4, 3, 1, 15000);
+-------- Excerise Step: 4 (Select Information) ↓ --------
+-- SELECT * -- a. Obtenga todos los productos almacenados
+--     FROM products
+-- SELECT * -- b. Obtenga todos los productos que tengan un precio mayor a 50000
+--     FROM products
+--     WHERE price > 50000
+-- SELECT * -- c. Obtenga todas las compras de un mismo producto por id.
+--     FROM bill_product
+--     WHERE product_id = 1
+-- SELECT product_id, SUM(product_amount) AS total_product_amount -- d. Obtenga todas las compras agrupadas por producto, donde se muestre el total comprado entre todas las compras.
+--     FROM bill_product
+--     GROUP BY product_id
+-- SELECT * -- e. Obtenga todas las facturas realizadas por el mismo comprador
+--     FROM bills
+--     WHERE customer_email = "mario072@gmail.com"
+-- SELECT * -- f. Obtenga todas las facturas ordenadas por monto total de forma descendente
+--     FROM bills
+--     ORDER BY total_amount DESC
+-- SELECT * -- g. Obtenga una sola factura por número de factura.
+--     FROM bills
+--     WHERE id = 1
