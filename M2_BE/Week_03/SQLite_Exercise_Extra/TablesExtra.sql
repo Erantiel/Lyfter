@@ -1,0 +1,95 @@
+-- Tables
+---------- Extra Excerise Step: 1 ↓ --------
+-- CREATE TABLE categories (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     name VARCHAR(50) UNIQUE NOT NULL,
+--     description VARCHAR(150) NOT NULL
+-- );
+-- ALTER TABLE products
+--     ADD category_id INTEGER;
+-- INSERT INTO categories(name, description)
+--     VALUES("Tech", "Everything related to hardware for your PC or console.");
+-- INSERT INTO categories(name, description)
+--     VALUES("Mobile", "Everything related mobile phone for low and high gamma products.");
+-- INSERT INTO categories(name, description)
+--     VALUES("Misc", "A little bit of everything you may need.");
+-- UPDATE products SET
+--     category_id = 1
+--     WHERE id = 1;
+-- UPDATE products SET
+--     category_id = 1
+--     WHERE id = 2;
+-- UPDATE products SET
+--     category_id = 2
+--     WHERE id = 3;
+-- SELECT * from products
+---------- Extra Excerise Step: 2 ↓ --------
+-- ALTER TABLE products -- Inserte al menos 10 filas en products con product_name, price, quantity
+--     ADD quantity INT;
+-- UPDATE products SET
+--     quantity = 10
+--     WHERE id = 1;
+-- UPDATE products SET
+--     quantity = 5
+--     WHERE id = 2;
+-- UPDATE products SET
+--     quantity = 0
+--     WHERE id = 3;
+-- INSERT INTO products (name, price, date_of_admission, brand, category_id, quantity)
+--     VALUES ("AirPods", 90000, "03/21/24", "Apple", 2, 150);
+-- INSERT INTO products (name, price, date_of_admission, brand, category_id, quantity)
+--     VALUES ("AirTag", 25000, "03/12/24", "Apple", 2, 78);
+-- INSERT INTO products (name, price, date_of_admission, brand, category_id, quantity)
+--     VALUES ("Apple Watch", 200000, "01/11/24", "Apple", 2, 23);
+-- INSERT INTO products (name, price, date_of_admission, brand, category_id, quantity)
+--     VALUES ("HomePod", 85000, "02/24/25", "Apple", 2, 0);
+-- INSERT INTO products (name, price, date_of_admission, brand, category_id, quantity)
+--     VALUES ("iMac", 340000, "05/22/24", "Apple", 2, 0);
+-- INSERT INTO products (name, price, date_of_admission, brand, category_id, quantity)
+--     VALUES ("iPad", 95000, "10/20/23", "Apple", 2, 15);
+-- INSERT INTO products (name, price, date_of_admission, brand, category_id, quantity)
+--     VALUES ("Vision Pro", 1300000, "11/11/23", "Apple", 2, 3);
+-- SELECT * from products -- Seleccione todos los productos
+-- SELECT * from products -- Seleccione productos con price > 50000
+--     WHERE price > 50000
+-- SELECT * FROM products -- Seleccione productos cuyo product_name contenga la palabra “apple” usando LIKE
+--     WHERE brand LIKE "apple" -- No veo la nececidad en este caso de usar Wildcards
+-- SELECT * from products -- Liste los 5 productos más caros con ORDER BY price DESC LIMIT 5
+--     ORDER BY price DESC LIMIT 5
+---------- Extra Excerise Step: 3 ↓ --------
+-- ALTER TABLE bills -- Agregue a invoices las columnas phone (TEXT, puede ser NULL) y cashier_code (TEXT, por defecto 'N/A')
+--     ADD phone TEXT;
+-- ALTER TABLE bills
+--     ADD cashier_code TEXT DEFAULT "N/A";
+-- UPDATE bills SET -- Actualice varias facturas asignando valores a phone y cashier_code
+--     phone = "+50698571524",
+--     cashier_code = 01923
+--     WHERE id = 1;
+-- UPDATE bills SET
+--     phone = "+50667589840",
+--     cashier_code = 01923
+--     WHERE id = 2;
+-- UPDATE bills SET
+--     phone = "+50640987612",
+--     cashier_code = 01317
+--     WHERE id = 3;
+-- UPDATE bills SET
+--     phone = "+50687659090",
+--     cashier_code = 01142
+--     WHERE id = 4;
+-- SELECT * FROM bills  -- Seleccione todas las facturas que tengan phone vacío o NULL
+--     WHERE phone = "" OR phone IS NULL;
+-- SELECT * FROM bills -- Seleccione una sola factura por invoice_id
+--     WHERE id = 1;
+---------- Extra Excerise Step: 4 ↓ --------
+-- UPDATE products SET -- Establezca quantity = 0 donde price <= 0
+--     quantity = 0
+--     WHERE price <= 0;
+-- UPDATE products SET -- Aumente el price en 100 unidades para todos los productos cuando quantity sea menor a 10
+--     price = price * 100
+--     WHERE quantity < 10;
+-- UPDATE products SET -- Disminuya quantity en 1 para un product_id específico
+--     quantity = quantity - 1
+--     WHERE id = 1;
+-- SELECT * FROM products -- Verifique con SELECT * FROM products ORDER BY id ASC LIMIT 10
+--     ORDER BY id ASC LIMIT 10
