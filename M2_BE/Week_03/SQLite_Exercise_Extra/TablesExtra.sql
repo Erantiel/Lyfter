@@ -1,13 +1,13 @@
 -- Tables
 ---------- Extra Excerise Step: 1 ↓ --------
--- CREATE TABLE categories (
+-- CREATE TABLE categories ( -- Cree la tabla categories con: id (PK autoincrement), name (UNIQUE, NOT NULL), description
 --     id INTEGER PRIMARY KEY AUTOINCREMENT,
 --     name VARCHAR(50) UNIQUE NOT NULL,
 --     description VARCHAR(150) NOT NULL
 -- );
--- ALTER TABLE products
+-- ALTER TABLE products -- Agregue a products la columna category_id (INTEGER, puede permitir NULL)
 --     ADD category_id INTEGER;
--- INSERT INTO categories(name, description)
+-- INSERT INTO categories(name, description) -- Actualice algunos products asignándoles un category_id
 --     VALUES("Tech", "Everything related to hardware for your PC or console.");
 -- INSERT INTO categories(name, description)
 --     VALUES("Mobile", "Everything related mobile phone for low and high gamma products.");
@@ -22,7 +22,7 @@
 -- UPDATE products SET
 --     category_id = 2
 --     WHERE id = 3;
--- SELECT * from products
+-- SELECT * from products -- Verifique con SELECT * FROM products (muestre id, product_name, price, quantity, category_id)
 ---------- Extra Excerise Step: 2 ↓ --------
 -- ALTER TABLE products -- Inserte al menos 10 filas en products con product_name, price, quantity
 --     ADD quantity INT;
