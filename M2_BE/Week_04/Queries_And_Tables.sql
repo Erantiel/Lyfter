@@ -1,0 +1,96 @@
+-- Queries_And_Tables
+-- 
+-- CREATE TABLE authors (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     name TEXT NOT NULL
+-- );
+-- CREATE TABLE customers (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     name TEXT NOT NULL,
+--     email TEXT NOT NULL
+-- );
+-- CREATE TABLE books (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     name TEXT NOT NULL,
+--     author_id REFERENCES authors(id)
+-- );
+-- CREATE TABLE rents (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     book_id REFERENCES books(id),
+--     customer_id REFERENCES customers(id),
+--     state TEXT NOT NULL
+-- );
+--
+-- INSERT INTO books (name, author_id)
+--     VALUES ("Don Quijote", 1);
+-- INSERT INTO books (name, author_id)
+--     VALUES ("La Divina Comedia", 2);
+-- INSERT INTO books (name, author_id)
+--     VALUES ("Vagabond 1-3", 3);
+-- INSERT INTO books (name, author_id)
+--     VALUES ("Dragon Ball", 4);
+-- INSERT INTO books (name)
+--     VALUES ("The Book of the 5 Rings");
+--
+-- INSERT INTO authors (name)
+--     VALUES ("Miguel de Cervantes");
+-- INSERT INTO authors (name)
+--     VALUES ("Dante Alighieri");
+-- INSERT INTO authors (name)
+--     VALUES ("Takehiko Inoue");
+-- INSERT INTO authors (name)
+--     VALUES ("Akira Toriyama");
+-- INSERT INTO authors (name)
+--     VALUES ("Walt Disney");
+--
+-- INSERT INTO customers (name, email)
+--     VALUES ("John Doe", "j.doe@email.com");
+-- INSERT INTO customers (name, email)
+--     VALUES ("Jane Doe", "jane@doe.com");
+-- INSERT INTO customers (name, email)
+--     VALUES ("Luke Skywalker", "darth.son@email.com");
+--
+-- INSERT INTO rents (book_id, customer_id, state)
+--     VALUES (1, 2, "Returned");
+-- INSERT INTO rents (book_id, customer_id, state)
+--     VALUES (2, 2, "Returned");
+-- INSERT INTO rents (book_id, customer_id, state)
+--     VALUES (1, 1, "On Time");
+-- INSERT INTO rents (book_id, customer_id, state)
+--     VALUES (3, 1, "On Time");
+-- INSERT INTO rents (book_id, customer_id, state)
+--     VALUES (2, 2, "Overdue");
+--
+-- SELECT authors.name AS author, books.name AS book -- 1. Obtenga todos los libros y sus autores
+-- FROM books
+-- INNER JOIN authors ON books.author_id = authors.id;
+-- 
+-- SELECT books.name AS book_no_author -- 2. Obtenga todos los libros que no tienen autor
+-- FROM books
+-- LEFT JOIN authors ON authors.id = books.author_id
+-- WHERE books.author_id IS NULL;
+--
+-- SELECT authors.name AS author_no_book -- 3. Obtenga todos los autores que no tienen libros
+-- FROM authors
+-- LEFT JOIN books ON authors.id = books.author_id
+-- WHERE books.author_id IS NULL;
+--
+-- SELECT DISTINCT books.name -- 4. Obtenga todos los libros que han sido rentados en algún momento
+-- FROM books
+-- LEFT JOIN rents ON books.id = rents.book_id
+-- WHERE rents.state IS NOT NULL
+--
+-- SELECT DISTINCT books.name -- 5. Obtenga todos los libros que nunca han sido rentados
+-- FROM books
+-- LEFT JOIN rents ON books.id = rents.book_id
+-- WHERE rents.state IS NULL
+--
+-- SELECT customers.name-- 6. Obtenga todos los clientes que nunca han rentado un libro
+-- FROM customers
+-- LEFT JOIN rents ON customers.id = rents.customer_id
+-- WHERE rents.customer_id IS NULL
+--
+-- SELECT books.name -- 7. Obtenga todos los libros que han sido rentados y están en estado “Overdue”
+-- FROM books
+-- LEFT JOIN rents ON books.id = rents.book_id
+-- WHERE rents.state = "Overdue"
