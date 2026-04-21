@@ -1,0 +1,5 @@
+[{"id":1,"make":"Kia","model":"Rio","manufacture_year":"7/6/2025","status":true},
+{"id":2,"make":"Mercedes-Benz","model":"M-Class","manufacture_year":"3/9/2026","status":false},
+{"id":3,"make":"Chevrolet","model":"Cobalt","manufacture_year":"5/23/2025","status":true},
+{"id":4,"make":"Nissan","model":"Murano","manufacture_year":"1/23/2026","status":true},
+{"id":5,"make":"Mazda","model":"626","manufacture_year":"4/25/2025","status":false}]
