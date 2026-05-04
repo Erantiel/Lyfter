@@ -6,7 +6,7 @@ CREATE TABLE lyfter_car_rental.users(
         username VARCHAR(50) NOT NULL,
         password VARCHAR(50) NOT NULL,
         birthday TEXT NOT NULL,
-        status VARCHAR(50) NOT NULL
+        status VARCHAR(50) DEFAULT 'active'
         );
 
 
@@ -15,7 +15,7 @@ CREATE TABLE lyfter_car_rental.vehicles(
         make VARCHAR(50) NOT NULL,
         model VARCHAR(50) NOT NULL,
         manufacture_year TEXT NOT NULL,
-        status VARCHAR(50) NOT NULL
+        status VARCHAR(50) DEFAULT 'active'
         );
 
 
@@ -28,7 +28,7 @@ CREATE TABLE lyfter_car_rental.users_vehicles(
         rent_date DATE DEFAULT CURRENT_DATE,
         rent_end_date DATE DEFAULT CURRENT_DATE + INTERVAL '1 month',
         rent_devolution_date DATE DEFAULT NULL,
-        rent_status VARCHAR(50) NOT NULL
+        status VARCHAR(50) DEFAULT 'rented'
         );
 
 
