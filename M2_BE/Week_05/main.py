@@ -196,6 +196,8 @@ class UsersVehicles(MethodView):
                 return jsonify({"error":"The filter only accepts id."}), 404
             if update != "status":
                 return jsonify({"error":"You can only update the status of a rent."}), 404
+            if data['status'] != "completed":
+                return jsonify({"error":"The status of a rent can only be changed to completed."}), 404
             query_update_status = f"""
             UPDATE lyfter_car_rental.users_vehicles 
             SET {update} = %s
