@@ -17,14 +17,14 @@ class Users(MethodView):
             allowed_filters = ["id", "name", "email", "username", "password", "birthday", "status"]
             if not filter:
                 get_query = database.execute_query("""
-                SELECT * FROM lyfter_car_rental.users
+                SELECT * FROM users
                 ORDER BY id ASC
                 """)
                 return jsonify({"response":get_query}), 200
             if filter not in allowed_filters:
                 return jsonify({"error":"This method only accepts id, name, email, username, password, birthday or status."}), 404
             filter_query = database.execute_query(f"""
-            SELECT * FROM lyfter_car_rental.users
+            SELECT * FROM users
             WHERE {filter} = %s
             """,(value,))
             database.close_connection
@@ -40,7 +40,7 @@ class Users(MethodView):
             validations.validate_keys_users(data)
             validations.validate_data_users(data)
             database.execute_query("""
-            INSERT INTO lyfter_car_rental.users(name, email, username, password, birthday)
+            INSERT INTO users(name, email, username, password, birthday)
             VALUES (%s, %s, %s, %s, %s)
             """,(data['name'], data['email'], data['username'], data['password'], data['birthday']))
             database.close_connection
@@ -62,7 +62,7 @@ class Users(MethodView):
             if update != "status":
                 return jsonify({"error":"You can only update the status of a user."}), 404
             database.execute_query(f"""
-            UPDATE lyfter_car_rental.users 
+            UPDATE users 
             SET {update} = %s
             WHERE {filter} = %s
             """,(data[update], value))
@@ -80,14 +80,14 @@ class Vehicles(MethodView):
             allowed_filters = ["id", "make", "model", "manufacture_year", "status"]
             if not filter:
                 get_query = database.execute_query(f"""
-                SELECT * FROM lyfter_car_rental.vehicles
+                SELECT * FROM vehicles
                 ORDER BY id ASC
                 """)
                 return jsonify({"response":get_query}), 200
             if filter not in allowed_filters:
                 return jsonify({"error":"This method only accepts id, make, model, manufacture_year or status."}), 404
             filter_query = database.execute_query(f"""
-            SELECT * FROM lyfter_car_rental.vehicles
+            SELECT * FROM vehicles
             WHERE {filter} = %s
             """,(value,))
             database.close_connection
@@ -103,7 +103,7 @@ class Vehicles(MethodView):
             validations.validate_keys_vehicles(data)
             validations.validate_data_vehicles(data)
             database.execute_query("""
-            INSERT INTO lyfter_car_rental.vehicles(make, model, manufacture_year)
+            INSERT INTO vehicles(make, model, manufacture_year)
             VALUES (%s, %s, %s)""",(data['make'], data['model'], data['manufacture_year']))
             database.close_connection
             return jsonify({"response":"Vehicle added."}), 201
@@ -124,7 +124,7 @@ class Vehicles(MethodView):
             if update != "status":
                 return jsonify({"error":"You can only update the status of a vehicle."}), 404
             database.execute_query(f"""
-            UPDATE lyfter_car_rental.vehicles 
+            UPDATE vehicles 
             SET {update} = %s
             WHERE {filter} = %s
             """,(data[update], value))
@@ -142,14 +142,14 @@ class UsersVehicles(MethodView):
             allowed_filters = ["user_id", "vehicle_id"]
             if not filter:
                 get_query = database.execute_query(f"""
-                SELECT * FROM lyfter_car_rental.users_vehicles
+                SELECT * FROM users_vehicles
                 ORDER BY id ASC
                 """)
                 return jsonify({"response":get_query}), 200
             if filter not in allowed_filters:
                 return jsonify({"error":"This method only accepts user_id and vehicle id."}), 404
             filter_query = database.execute_query(f"""
-            SELECT * FROM lyfter_car_rental.users_vehicles
+            SELECT * FROM users_vehicles
             WHERE {filter} = &s
             """,(value,))
             database.close_connection
@@ -165,7 +165,7 @@ class UsersVehicles(MethodView):
             validations.validate_keys_users_vehicles(data)
             validations.validate_data_users_vehicles(data)
             car_status_query = database.execute_query(f"""
-            SELECT status FROM lyfter_car_rental.vehicles
+            SELECT status FROM vehicles
             WHERE id = %s
             """,(data['vehicle_id']))
             car_status = car_status_query[0][0]
@@ -175,10 +175,10 @@ class UsersVehicles(MethodView):
             elif car_status == 'not available':
                 return jsonify({"error":"The vehicle you are trying to rent is not available."}), 400
             database.execute_query("""
-            INSERT INTO lyfter_car_rental.users_vehicles(user_id, vehicle_id)
+            INSERT INTO users_vehicles(user_id, vehicle_id)
             VALUES (%s, %s)""",(data['user_id'], data['vehicle_id']))
             database.execute_query(f"""
-            UPDATE lyfter_car_rental.vehicles
+            UPDATE vehicles
             SET status = 'rented'
             WHERE id = %s
             """,
@@ -204,17 +204,17 @@ class UsersVehicles(MethodView):
             if data['status'] != "completed":
                 return jsonify({"error":"The status of a rent can only be changed to completed."}), 404
             query_update_status = f"""
-            UPDATE lyfter_car_rental.users_vehicles 
+            UPDATE users_vehicles 
             SET {update} = %s
             WHERE {filter} = %s
             """
             query_rent_completed = f"""
-            UPDATE lyfter_car_rental.vehicles
+            UPDATE vehicles
             SET {update} = 'available'
             WHERE {filter} = %s
             """
             query_date_completion = f"""
-            UPDATE lyfter_car_rental.users_vehicles
+            UPDATE users_vehicles
             SET rent_devolution_date = CURRENT_DATE
             WHERE {filter} = %s
             """
