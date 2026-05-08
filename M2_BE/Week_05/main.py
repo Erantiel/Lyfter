@@ -14,19 +14,23 @@ class Users(MethodView):
         try:
             filter = request.args.get("filter")
             value = request.args.get("value")
-            allowed_filters = ["id", "name", "email", "username", "password", "birthday", "status"]
+            allowed_filters = ["id", "name", "email", "username", "password", "birthday", "overdue", "status"]
+            
             if not filter:
                 get_query = database.execute_query("""
                 SELECT * FROM users
                 ORDER BY id ASC
                 """)
                 return jsonify({"response":get_query}), 200
+            
             if filter not in allowed_filters:
-                return jsonify({"error":"This method only accepts id, name, email, username, password, birthday or status."}), 404
+                return jsonify({"error":"This method only accepts id, name, email, username, password, birthday, overdue or status."}), 404
+            
             filter_query = database.execute_query(f"""
             SELECT * FROM users
             WHERE {filter} = %s
             """,(value,))
+            
             database.close_connection
             return jsonify({"response":filter_query}), 200
         except ValueError as ex:
@@ -39,10 +43,12 @@ class Users(MethodView):
             data = request.json
             validations.validate_keys_users(data)
             validations.validate_data_users(data)
+            
             database.execute_query("""
             INSERT INTO users(name, email, username, password, birthday)
             VALUES (%s, %s, %s, %s, %s)
             """,(data['name'], data['email'], data['username'], data['password'], data['birthday']))
+            
             database.close_connection
             return jsonify({"response":"User added."}), 201
         except ValueError as ex:
@@ -55,17 +61,16 @@ class Users(MethodView):
             filter = request.args.get("filter")
             value = request.args.get("value")
             data = request.json
+            
             if not update or not filter or not value:
                 return jsonify({"error":"In order to update the table, the following parameters are needed: update, filter and value."}), 400
-            if filter != "id":
-                return jsonify({"error":"The filter only accepts id."}), 404
-            if update != "status":
-                return jsonify({"error":"You can only update the status of a user."}), 404
+            
             database.execute_query(f"""
             UPDATE users 
             SET {update} = %s
             WHERE {filter} = %s
             """,(data[update], value))
+            
             database.close_connection
             return jsonify({"response":"Database updated."}), 200
         except ValueError as ex:
@@ -78,18 +83,22 @@ class Vehicles(MethodView):
             filter = request.args.get("filter")
             value = request.args.get("value")
             allowed_filters = ["id", "make", "model", "manufacture_year", "status"]
+            
             if not filter:
                 get_query = database.execute_query(f"""
                 SELECT * FROM vehicles
                 ORDER BY id ASC
                 """)
                 return jsonify({"response":get_query}), 200
+            
             if filter not in allowed_filters:
                 return jsonify({"error":"This method only accepts id, make, model, manufacture_year or status."}), 404
+            
             filter_query = database.execute_query(f"""
             SELECT * FROM vehicles
             WHERE {filter} = %s
             """,(value,))
+            
             database.close_connection
             return jsonify({"response":filter_query}), 200
         except ValueError as ex:
@@ -102,9 +111,11 @@ class Vehicles(MethodView):
             data = request.json
             validations.validate_keys_vehicles(data)
             validations.validate_data_vehicles(data)
+            
             database.execute_query("""
             INSERT INTO vehicles(make, model, manufacture_year)
             VALUES (%s, %s, %s)""",(data['make'], data['model'], data['manufacture_year']))
+            
             database.close_connection
             return jsonify({"response":"Vehicle added."}), 201
         except ValueError as ex:
@@ -117,17 +128,16 @@ class Vehicles(MethodView):
             filter = request.args.get("filter")
             value = request.args.get("value")
             data = request.json
+            
             if not update or not filter or not value:
                 return jsonify({"error":"In order to update the table, the following parameters are needed: update, filter and value."}), 400
-            if filter != "id":
-                return jsonify({"error":"The filter only accepts id."}), 404
-            if update != "status":
-                return jsonify({"error":"You can only update the status of a vehicle."}), 404
+            
             database.execute_query(f"""
             UPDATE vehicles 
             SET {update} = %s
             WHERE {filter} = %s
             """,(data[update], value))
+            
             database.close_connection
             return jsonify({"response":"Database updated."}), 200
         except ValueError as ex:
@@ -139,19 +149,23 @@ class UsersVehicles(MethodView):
         try:
             filter = request.args.get("filter")
             value = request.args.get("value")
-            allowed_filters = ["user_id", "vehicle_id"]
+            allowed_filters = ["id", "user_id", "vehicle_id", "rent_date", "rent_end_date", "rent_devolution_date", "status"]
+            
             if not filter:
                 get_query = database.execute_query(f"""
                 SELECT * FROM users_vehicles
                 ORDER BY id ASC
                 """)
                 return jsonify({"response":get_query}), 200
+            
             if filter not in allowed_filters:
-                return jsonify({"error":"This method only accepts user_id and vehicle id."}), 404
+                return jsonify({"error":"This method only accepts id, user_id, vehicle id, rent_date, rent_end_date, rent_devolution_date and status."}), 404
+            
             filter_query = database.execute_query(f"""
             SELECT * FROM users_vehicles
             WHERE {filter} = &s
             """,(value,))
+            
             database.close_connection
             return jsonify({"response":filter_query}), 200
         except ValueError as ex:
@@ -164,25 +178,45 @@ class UsersVehicles(MethodView):
             data = request.json
             validations.validate_keys_users_vehicles(data)
             validations.validate_data_users_vehicles(data)
+            
             car_status_query = database.execute_query(f"""
             SELECT status FROM vehicles
             WHERE id = %s
             """,(data['vehicle_id']))
+            
+            user_status_query = database.execute_query(f"""
+            SELECT status FROM users
+            WHERE id = %s
+            """,(data['user_id']))
+
+            user_overdue_query = database.execute_query(f"""
+            SELECT overdue FROM users
+            WHERE id = %s
+            """,(data['user_id']))
+            
             car_status = car_status_query[0][0]
-            print(car_status)
+            user_status = user_status_query[0][0]
+            user_overdue = user_overdue_query[0][0]
+
             if car_status == 'rented':
                 return jsonify({"error":"The vehicle you are trying to rent is already rented by an user."}), 400
             elif car_status == 'not available':
                 return jsonify({"error":"The vehicle you are trying to rent is not available."}), 400
+            elif user_status != 'active':
+                return jsonify({"error":"The user you are trying to use is not available or up to date to be used."}), 400
+            elif user_overdue == True:
+                return jsonify({"error":"The user you are trying to use is overdue. Rents are not possible on overdue users."}), 400
+            
             database.execute_query("""
             INSERT INTO users_vehicles(user_id, vehicle_id)
             VALUES (%s, %s)""",(data['user_id'], data['vehicle_id']))
+            
             database.execute_query(f"""
             UPDATE vehicles
             SET status = 'rented'
             WHERE id = %s
-            """,
-            (data['vehicle_id']))
+            """,(data['vehicle_id']))
+
             database.close_connection
             return jsonify({"response":"Rent added."}), 201
         except ValueError as ex:
@@ -195,32 +229,42 @@ class UsersVehicles(MethodView):
             filter = request.args.get("filter")
             value = request.args.get("value")
             data = request.json
+            
             if not update or not filter or not value:
                 return jsonify({"error":"In order to update the table, the following parameters are needed: update, filter and value."}), 400
-            if filter != "id":
-                return jsonify({"error":"The filter only accepts id."}), 404
-            if update != "status":
-                return jsonify({"error":"You can only update the status of a rent."}), 404
-            if data['status'] != "completed":
-                return jsonify({"error":"The status of a rent can only be changed to completed."}), 404
-            query_update_status = f"""
+            
+            query_update_status = database.execute_query(f"""
             UPDATE users_vehicles 
             SET {update} = %s
             WHERE {filter} = %s
-            """
-            query_rent_completed = f"""
-            UPDATE vehicles
-            SET {update} = 'available'
+            """, (data[update], value))
+
+            query_select_id = database.execute_query(f"""
+            SELECT id FROM users_vehicles
             WHERE {filter} = %s
-            """
-            query_date_completion = f"""
-            UPDATE users_vehicles
-            SET rent_devolution_date = CURRENT_DATE
+            """, (value,))
+
+            query_select_vehicle_id = database.execute_query(f"""
+            SELECT vehicle_id FROM users_vehicles
             WHERE {filter} = %s
-            """
-            database.execute_query(query_update_status, (data[update], value))
-            database.execute_query(query_rent_completed, (value))
-            database.execute_query(query_date_completion, (value))
+            """, (value,))
+
+            user_vehicle_id = query_select_id[0][0]
+            vehicle_id = query_select_vehicle_id[0][0]
+            
+            if data[update] == "completed":
+                query_rent_completed = database.execute_query(f"""
+                UPDATE vehicles
+                SET status = 'available'
+                WHERE id = {vehicle_id}
+                """, (value,))
+                
+                query_date_completion = database.execute_query(f"""
+                UPDATE users_vehicles
+                SET rent_devolution_date = CURRENT_DATE
+                WHERE id = {user_vehicle_id}
+                """, (value,))
+            
             database.close_connection
             return jsonify({"response":"Database updated."}), 200
         except ValueError as ex:

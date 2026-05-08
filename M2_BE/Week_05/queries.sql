@@ -6,6 +6,7 @@ CREATE TABLE lyfter_car_rental.users(
         username VARCHAR(50) NOT NULL,
         password VARCHAR(50) NOT NULL,
         birthday TEXT NOT NULL,
+        overdue BOOLEAN DEFAULT false,
         status VARCHAR(50) DEFAULT 'active'
         );
 
@@ -32,56 +33,56 @@ CREATE TABLE lyfter_car_rental.users_vehicles(
         );
 
 
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Sarina Peto', 'speto0@china.com.cn', 'speto0', 'gS3/"?1=4I', '4/25/2023', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Miran Yakobowitch', 'myakobowitch1@cnbc.com', 'myakobowitch1', 'bK7<E*\8Eq', '7/10/2021', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Emeline Sturmey', 'esturmey2@archive.org', 'esturmey2', 'sG8/|O7v$<W', '6/21/1991', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Bird Kondratovich', 'bkondratovich3@miitbeian.gov.cn', 'bkondratovich3', 'xB1/!Le*qxRU9lr', '4/30/1999', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Sib Baitman', 'sbaitman4@cmu.edu', 'sbaitman4', 'kB1*y@m1KDR$.', '9/25/2007', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Ellette Lackeye', 'elackeye5@unc.edu', 'elackeye5', 'sM8\{Ky{l9sFc+&', '7/29/2020', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Hillery Escalante', 'hescalante6@networkadvertising.org', 'hescalante6', 'jL5@@q~Bi_FccZ.', '7/17/1991', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Skelly Keslake', 'skeslake7@archive.org', 'skeslake7', 'pL5_+a9<z', '7/26/2011', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Shantee Winscum', 'swinscum8@accuweather.com', 'swinscum8', 'tQ9+}|Bn?947', '6/25/2010', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Brinn Shoutt', 'bshoutt9@51.la', 'bshoutt9', 'nM6&dlfU?_J8,m!', '12/13/2022', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Bekki Tomkys', 'btomkysa@springer.com', 'btomkysa', 'jJ0?Ev.k=JZqVLWc', '1/21/2012', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Marabel Houseago', 'mhouseagob@illinois.edu', 'mhouseagob', 'yP1`CV=klM"w!y', '4/13/2001', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Tarrah Mayall', 'tmayallc@ca.gov', 'tmayallc', 'lS7!0d?q', '4/24/2003', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Conant Blanque', 'cblanqued@webs.com', 'cblanqued', 'dX1/v!.w?kYQWyf', '11/27/1996', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Jacynth Howroyd', 'jhowroyde@issuu.com', 'jhowroyde', 'rV6%f{bl%m{~.$', '7/1/2000', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Jone Craigs', 'jcraigsf@163.com', 'jcraigsf', 'fW9+}"z"GtSzU2Q', '8/1/2011', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Georgette Assaf', 'gassafg@foxnews.com', 'gassafg', 'gW3!I*#<', '5/15/2020', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Blair Berthomieu', 'bberthomieuh@newsvine.com', 'bberthomieuh', 'sK4?B1UYxW}', '4/28/2025', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Goldarina Fairest', 'gfairesti@cbc.ca', 'gfairesti', 'wJ8*N_)d_t5*H', '6/30/1997', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Latashia Maseres', 'lmaseresj@wikia.com', 'lmaseresj', 'uV9{nEW&FTJ~J5', '7/10/2001', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Jonah Janiak', 'jjaniakk@lulu.com', 'jjaniakk', 'oC3+8N3$WZ"', '2/8/2020', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Beck Tratton', 'btrattonl@geocities.com', 'btrattonl', 'wP7(16mr|d*', '10/17/2021', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Ainslee Laweles', 'alawelesm@slashdot.org', 'alawelesm', 'lG6,J<m8s~CXc}i', '1/19/2008', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Martie Jarmain', 'mjarmainn@imgur.com', 'mjarmainn', 'xW4*/%IR1n0F', '7/19/1996', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Berkly Neggrini', 'bneggrinio@phoca.cz', 'bneggrinio', 'aS2&"V.hPTG', '5/28/1995', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Wendeline Swansborough', 'wswansboroughp@i2i.jp', 'wswansboroughp', 'xT3?1|((@', '6/9/2024', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Calypso Rampling', 'cramplingq@fotki.com', 'cramplingq', 'mA7|G\c`obqr~h`Y', '12/28/1999', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Teriann Byneth', 'tbynethr@ovh.net', 'tbynethr', 'vD1>JAUtb!jF}@I', '6/17/1991', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Kamilah Gaythor', 'kgaythors@cbsnews.com', 'kgaythors', 'rK8=?tjH$U', '4/8/2025', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Artemas Ismail', 'aismailt@diigo.com', 'aismailt', 'cI5($!}eY', '1/31/1992', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Galina Ogles', 'goglesu@ask.com', 'goglesu', 'gQ2)78nk', '10/16/2017', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Barron Yeandel', 'byeandelv@nhs.uk', 'byeandelv', 'eK7)*lE}kiu', '8/6/2020', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Allin Choak', 'achoakw@tinyurl.com', 'achoakw', 'wG4~}/#(y87<yry', '11/8/2017', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Wyn Dallow', 'wdallowx@sbwire.com', 'wdallowx', 'cU3{<HOGE.g6', '2/25/2001', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Leela Girardoni', 'lgirardoniy@icio.us', 'lgirardoniy', 'gY0\+`V`K$', '11/16/2017', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Isabel Worlidge', 'iworlidgez@reference.com', 'iworlidgez', 'oD4|HDU&>#g",=', '9/10/2000', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Indira Krojn', 'ikrojn10@eventbrite.com', 'ikrojn10', 'yZ4(ev9+mRQG{', '5/30/1990', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Granville Fisby', 'gfisby11@reddit.com', 'gfisby11', 'hM0@%gZ9bcvY$?', '11/2/2025', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Philippine Point', 'ppoint12@com.com', 'ppoint12', 'xO1>fSFtS`h', '11/1/2010', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Clara Giraux', 'cgiraux13@independent.co.uk', 'cgiraux13', 'nB5~no.qF=rD}Z', '5/18/1997', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Adler Liverock', 'aliverock14@edublogs.org', 'aliverock14', 'dJ9~=ur32cL', '5/25/1991', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Chantal Juleff', 'cjuleff15@ted.com', 'cjuleff15', 'dH5$o*6XG/zh5f', '4/11/2001', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Ayn Gomes', 'agomes16@behance.net', 'agomes16', 'hZ1,DIJ|N+*`&K|+', '3/14/2020', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Glenna Goullee', 'ggoullee17@cbsnews.com', 'ggoullee17', 'vU5!}!3S', '4/22/2006', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Codie Dalziel', 'cdalziel18@blog.com', 'cdalziel18', 'uY3`f{\g>\.D8W', '6/20/2011', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Kamilah Sandom', 'ksandom19@bing.com', 'ksandom19', 'qF2/l{RvJ', '4/17/2010', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Marsha Cressor', 'mcressor1a@wired.com', 'mcressor1a', 'rS4(s*ffFh', '1/10/1992', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Louisa Middleton', 'lmiddleton1b@free.fr', 'lmiddleton1b', 'lU8!cUz{Wb_dBD0E', '10/23/2014', 'active');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Paulie Dicke', 'pdicke1c@woothemes.com', 'pdicke1c', 'nY4%iE>pC0j)T1', '3/9/1998', 'disabled');
-insert into lyfter_car_rental.users (name, email, username, password, birthday, status) values ('Fidole Mapston', 'fmapston1d@storify.com', 'fmapston1d', 'sK8>"#4P!`wx\2', '12/18/2020', 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Herbie Drakeford', 'hdrakeford0@about.me', 'hdrakeford0', 'zF0)02`V@zS7Pz', '3/31/2025', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Allison Gashion', 'agashion1@comcast.net', 'agashion1', 'nV2\A"zo7', '1/31/2014', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Conan Kubatsch', 'ckubatsch2@cisco.com', 'ckubatsch2', 'tO8$\,(OU<mN', '1/29/2017', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Quinlan Draye', 'qdraye3@4shared.com', 'qdraye3', 'aV0=Ygey', '6/9/1997', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Perri Lott', 'plott4@blogger.com', 'plott4', 'uU3|5t#v+iT', '8/18/2018', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Suellen Whiteside', 'swhiteside5@blog.com', 'swhiteside5', 'xE0"M5v~!GRBy', '5/19/1994', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Lainey Kemston', 'lkemston6@mozilla.com', 'lkemston6', 'lX3?>w?%,7C}&B', '10/3/1998', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Yvon Laterza', 'ylaterza7@cargocollective.com', 'ylaterza7', 'mJ1"Oj*W=oCCrTJG', '1/31/2007', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Stanwood Schinetti', 'sschinetti8@ustream.tv', 'sschinetti8', 'dO8/Obx?', '9/6/2005', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Alla Rudinger', 'arudinger9@walmart.com', 'arudinger9', 'fJ3(BB''JJ@m_/7rC', '9/16/1999', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Clarita McOrkill', 'cmcorkilla@globo.com', 'cmcorkilla', 'nF4_R)Pt8h', '10/20/1993', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Thaxter Moyer', 'tmoyerb@dot.gov', 'tmoyerb', 'mV0+@Gx`&lVr/OF`', '6/27/2015', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Tamera Glacken', 'tglackenc@blogspot.com', 'tglackenc', 'lS2+~W)p~`E3Pn', '9/17/2021', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Bryce Roseborough', 'broseboroughd@marriott.com', 'broseboroughd', 'eQ5(.E6s`', '5/17/2023', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Odell Dunlop', 'odunlope@virginia.edu', 'odunlope', 'jG8%A$vB%?T&Q', '4/4/2003', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Zia Belbin', 'zbelbinf@techcrunch.com', 'zbelbinf', 'tM3$/gR_a$W`+H', '12/6/2000', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Eleni Gettone', 'egettoneg@nbcnews.com', 'egettoneg', 'dZ5\u?MK{2Rg)~', '6/14/2013', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Pearce Ferran', 'pferranh@japanpost.jp', 'pferranh', 'kU8''U+IY4wvBFwJ', '2/20/2009', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Maurine Skeermor', 'mskeermori@netvibes.com', 'mskeermori', 'zN3''~<_`y', '9/2/1993', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Tootsie McEneny', 'tmcenenyj@netscape.com', 'tmcenenyj', 'nM4'',Vrb', '2/12/2007', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Philis Conrart', 'pconrartk@berkeley.edu', 'pconrartk', 'aQ8.IL*H$Cs%1W', '1/29/2009', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Desmond Eayres', 'deayresl@privacy.gov.au', 'deayresl', 'qZ1#`XN$m*n_/', '9/30/1990', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Claudette Galiero', 'cgalierom@youtube.com', 'cgalierom', 'bT9~WpbO', '10/9/2020', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Margy Drewitt', 'mdrewittn@friendfeed.com', 'mdrewittn', 'qZ0%G?_g(?g4', '8/1/2015', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Abigael Janz', 'ajanzo@xinhuanet.com', 'ajanzo', 'aX1%DY=K}C@?', '1/14/2008', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Bryant Gurnay', 'bgurnayp@utexas.edu', 'bgurnayp', 'oL8{s(h34!,oMYyn', '6/2/2006', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Vicki Coast', 'vcoastq@php.net', 'vcoastq', 'lZ2@!Vyho''H7', '7/22/1995', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Darleen Schowenburg', 'dschowenburgr@macromedia.com', 'dschowenburgr', 'bK9!24Sz_ai', '1/11/1994', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Beitris Trevarthen', 'btrevarthens@springer.com', 'btrevarthens', 'mH9{E8)BHl.*', '7/5/2021', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Valentina Dany', 'vdanyt@google.es', 'vdanyt', 'lT9"T1~8Ht7%#', '9/9/2017', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Stanislas Geke', 'sgekeu@desdev.cn', 'sgekeu', 'iZ4\J|)SzY%~\', '10/9/1991', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Dmitri Avrahamoff', 'davrahamoffv@icio.us', 'davrahamoffv', 'oB1%&w=''0s', '12/13/2001', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Almire Rowlatt', 'arowlattw@sciencedirect.com', 'arowlattw', 'aH5|H>(QzD(8hMW', '1/28/1996', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Hussein Redborn', 'hredbornx@timesonline.co.uk', 'hredbornx', 'jH9$2dhR', '4/23/2020', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Sybyl Hussey', 'shusseyy@europa.eu', 'shusseyy', 'mN5!A}K*aJ|FiT', '5/17/2025', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Boigie De Gowe', 'bdez@mashable.com', 'bdez', 'tL2&t|35', '1/25/2009', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Zelda Sexstone', 'zsexstone10@cdc.gov', 'zsexstone10', 'dF8*qrNw41Zh9k@O', '10/4/2015', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Jackie Spellesy', 'jspellesy11@harvard.edu', 'jspellesy11', 'rP8{|hf>a4@?RDC', '12/30/2002', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Bayard Goggan', 'bgoggan12@latimes.com', 'bgoggan12', 'oN6,vu?+yBxpa&', '11/8/2012', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Janaye Czajkowski', 'jczajkowski13@hao123.com', 'jczajkowski13', 'sF2|/zE1>rg.X', '9/26/2021', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Alfy Brownsworth', 'abrownsworth14@naver.com', 'abrownsworth14', 'xZ9(qJY+N', '11/23/2006', false, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Ailis Mence', 'amence15@artisteer.com', 'amence15', 'yS5''wxX1H?', '4/11/2010', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Marsh Davley', 'mdavley16@nifty.com', 'mdavley16', 'jJ1!Z(Rg,7(TMBW', '10/1/2004', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Erroll Blemings', 'eblemings17@google.ru', 'eblemings17', 'mO7)34<`etA', '3/1/2018', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Adda Drinkel', 'adrinkel18@census.gov', 'adrinkel18', 'lW2''*u,y=)s=XD5/', '5/17/2010', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Domeniga McCard', 'dmccard19@youku.com', 'dmccard19', 'cA9~I,M#Hb', '11/21/1998', true, 'disabled');
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Breena Standen', 'bstanden1a@sogou.com', 'bstanden1a', 'xX9%4S}as,}', '12/23/1991', true);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Aaren Addeycott', 'aaddeycott1b@spiegel.de', 'aaddeycott1b', 'hE8#9+y1wD>0|{s', '11/3/2007', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue) values ('Ulick McGerr', 'umcgerr1c@usda.gov', 'umcgerr1c', 'tW5)l.aeqn', '6/6/2004', false);
+insert into lyfter_car_rental.users (name, email, username, password, birthday, overdue, status) values ('Tobi Tommis', 'ttommis1d@nih.gov', 'ttommis1d', 'mX4)WiiTxbZmx@9', '12/11/2012', true, 'disabled');
 
 
 insert into lyfter_car_rental.vehicles (make, model, manufacture_year, status) values ('Dodge', 'Ram Van 2500', '2/9/2012', 'available');
