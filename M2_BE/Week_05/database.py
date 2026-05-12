@@ -151,7 +151,7 @@ class PgManager:
             self.cursor.execute(f"""INSERT INTO lyfter_car_rental.users_vehicles(user_id, vehicle_id, status)
                                 VALUES (%s, %s, %s)
             """,(
-            fake.unique.random_int(min=1, max= 250),
+            fake.random_int(min=1, max= 250),
             fake.unique.random_int(min=1, max= 110),
             fake.status()
             ))
