@@ -8,6 +8,20 @@ database = PgManager("localhost", 5432, "postgres", "postgres", "postgres", "-c 
 
 app = Flask(__name__)
 
+database.backup_export_database("users.csv","lyfter_car_rental.users")
+database.backup_export_database("vehicles.csv","lyfter_car_rental.vehicles")
+database.backup_export_database("users_vehicles.csv","lyfter_car_rental.users_vehicles")
+
+
+database.check_table_exists("users","lyfter_car_rental.users")
+database.check_table_exists("vehicles","lyfter_car_rental.vehicles")
+database.check_table_exists("rents","lyfter_car_rental.users_vehicles")
+
+
+database.faker_users(200)
+database.faker_vehicles(140)
+database.faker_users_vehicles(50,150)
+
 
 class Users(MethodView):
     def get(self):
@@ -280,4 +294,4 @@ app.add_url_rule("/vehicles", methods=["GET", "POST", "PUT"], view_func=vehicles
 app.add_url_rule("/users_vehicles", methods=["GET", "POST", "PUT"], view_func=users_vehicles_view)
 
 if __name__ == "__main__":
-    app.run(host="localhost", debug=True)
+    app.run(host="localhost", debug=True, use_reloader=False)
