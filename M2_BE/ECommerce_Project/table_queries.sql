@@ -44,7 +44,8 @@ CREATE TABLE e_commerce.product(
         id SERIAL PRIMARY KEY,
         sku VARCHAR(100) UNIQUE NOT NULL,
         name VARCHAR(100) NOT NULL,
-        price VARCHAR(100) NOT NULL,
+        price INT NOT NULL,
+        currency VARCHAR(100) NOT NULL,
         description TEXT NOT NULL,
         category_id INT NOT NULL,
         FOREIGN KEY (category_id) REFERENCES e_commerce.category(id),
@@ -70,7 +71,10 @@ CREATE TABLE e_commerce.bill(
         user_id INT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES e_commerce.user(id),
         date_of_purchase DATE DEFAULT CURRENT_DATE,
-        total_amount VARCHAR(100) NOT NULL
+        total_amount INT NOT NULL,
+        currency VARCHAR(100) NOT NULL,
+        payment_method_id INT NOT NULL,
+        FOREIGN KEY (payment_method_id) REFERENCES e_commerce.payment_method(id)
         );
 
 
@@ -81,17 +85,23 @@ CREATE TABLE e_commerce.product_bill(
         bill_id INT NOT NULL,
         FOREIGN KEY (bill_id) REFERENCES e_commerce.bill(id),
         product_amount INT NOT NULL,
-        total_amount VARCHAR(100) NOT NULL
+        total_amount INT NOT NULL,
+        currency VARCHAR(100)
         );
 
 
 CREATE TABLE e_commerce.shopping_cart(
         id SERIAL PRIMARY KEY,
         user_id INT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES e_commerce.user(id),
+        FOREIGN KEY (user_id) REFERENCES e_commerce.user(id)
+        );
+
+
+CREATE TABLE e_commerce.product_shopping_cart(
+        id SERIAl PRIMARY KEY,
+        shopping_cart_id INT NOT NULL,
+        FOREIGN KEY (shopping_cart_id) REFERENCES e_commerce.shopping_cart(id),
         product_id INT NOT NULL,
         FOREIGN KEY (product_id) REFERENCES e_commerce.product(id),
-        product_amount INT NOT NULL,
-        payment_method_id INT NOT NULL,
-        FOREIGN KEY (payment_method_id) REFERENCES e_commerce.payment_method(id)
-        );
+        product_amount INT NOT NULL
+        )
