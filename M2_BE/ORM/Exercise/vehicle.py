@@ -50,4 +50,4 @@ class Vehicle:
         .where(getattr(self.vehicle_table.c, where_column) == where_value)
         .values({"user_id":new_value}))
         self.session.execute(query)
-        self.session.commit()        
+        self.session.commit()

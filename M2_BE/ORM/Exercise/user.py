@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, String, insert, update, delete, select
+from sqlalchemy import Table, Column, Integer, String, insert, update, delete, select, func
 
 class User:
     def __init__(self, session, metadata_obj, engine):
