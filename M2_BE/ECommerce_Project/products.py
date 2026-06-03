@@ -1,14 +1,23 @@
 from flask import jsonify, request
 from flask.views import MethodView
 import files
+from database import PgManager
+
+
+database = PgManager("localhost", 5432, "postgres", "postgres", "postgres", "-c search_path=e_commerce")
 
 
 class Products(MethodView):
     def get(self):
-        products = []
-        products = files.open_json("products.json")
-
-        return jsonify({"response":products}), 200
+        try:
+            get_query = database.execute_query("""
+            SELECT * FROM products
+            ORDER BY id ASC
+            """)
+            database.close_connection()
+            return jsonify({"response":get_query}), 200
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
 
 
     def post(self):
