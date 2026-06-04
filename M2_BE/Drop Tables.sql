@@ -1,0 +1,5 @@
+--DROP SCHEMA e_commerce CASCADE;
+--CREATE SCHEMA e_commerce;
+
+DROP SCHEMA orm CASCADE;
+CREATE SCHEMA orm;
