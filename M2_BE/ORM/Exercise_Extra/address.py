@@ -13,7 +13,7 @@ class Address(Base):
     user = relationship("User", back_populates="address")
 
     @classmethod
-    def sort_address_by(cls, session, value):
+    def filter_address_by(cls, session, value):
         stmt = select(cls).where(cls.address.ilike(f"%{value}%"))
         addresses = session.scalars(stmt).all()
 

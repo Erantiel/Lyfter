@@ -3,6 +3,7 @@ from base import Base
 from user import User
 from address import Address
 from vehicle import Vehicle
+import fake_data
 
 db = SqlAlchemyManager("postgresql", "postgres", "postgres", "localhost", "5432", "postgres")
 
@@ -33,10 +34,10 @@ Base.metadata.create_all(db.engine)
 # db.session.add_all(vehicles)
 # db.session.commit()
 
-# User.user_related_info(db.session, 8)
+# User.user_related_info(db.session, 2)
 # Vehicle.all_vehicles_with_no_user(db.session)
 # User.all_users_with_more_than_one_vehicle(db.session)
-# Address.sort_address_by(db.session, "apt")
-# User.fake_data(db.session)
+# Address.filter_address_by(db.session, "apt")
+# fake_data.fake_user_with_address_and_vehicle_relation(db.session)
 
 db.close_connection()
