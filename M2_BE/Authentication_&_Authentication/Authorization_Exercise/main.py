@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request, Response
 from flask.views import MethodView
 from database import SqlAlchemyManager
-from sqlalchemy.exc import IntegrityError
 from jwt_manager import JWT_Manager
 from repositories.bill import Bill as BillModel
 from repositories.product import Product as ProductModel
@@ -99,7 +98,7 @@ class UserView(MethodView):
                 db_manager.close_connection()
                 return jsonify("User updated."), 200
             else:
-                return jsonify("You do not have the rights to edit users.")
+                return jsonify("You do not have the rights to edit users."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -121,7 +120,7 @@ class UserView(MethodView):
                 db_manager.close_connection()
                 return Response(status=204)
             else:
-                return jsonify("You do not have the rights to delete users.")
+                return jsonify("You do not have the rights to delete users."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -162,7 +161,7 @@ class ProductView(MethodView):
                 ProductModel.insert_product(db_manager.session, data.get("name"), data.get("price"))
                 return jsonify("Product created."), 200
             else:
-                return jsonify("You do not have the rights to add products.")
+                return jsonify("You do not have the rights to add products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -184,7 +183,7 @@ class ProductView(MethodView):
                 db_manager.close_connection()
                 return jsonify("Product updated."), 200
             else:
-                return jsonify("You do not have the rights to update products.")
+                return jsonify("You do not have the rights to update products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -206,7 +205,7 @@ class ProductView(MethodView):
                 db_manager.close_connection()
                 return Response(status=204)
             else:
-                return jsonify("You do not have the rights to delete products.")
+                return jsonify("You do not have the rights to delete products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception:
@@ -246,7 +245,7 @@ class StorageView(MethodView):
                 StorageModel.insert_storage(db_manager.session, data.get("product_id"), data.get("amount"))
                 return jsonify("Item added to the storage."), 200
             else:
-                return jsonify("You do not have the rights to add to the storage.")
+                return jsonify("You do not have the rights to add to the storage."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -268,7 +267,7 @@ class StorageView(MethodView):
                 db_manager.close_connection()
                 return jsonify("Storage updated."), 200
             else:
-                return jsonify("You do not have the rights to add update the storage.")
+                return jsonify("You do not have the rights to add update the storage."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -290,7 +289,7 @@ class StorageView(MethodView):
                 db_manager.close_connection()
                 return Response(status=204)
             else:
-                return jsonify("You do not have the rights to add delete from the storage.")
+                return jsonify("You do not have the rights to add delete from the storage."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception:
@@ -342,7 +341,7 @@ class BillView(MethodView):
                 StorageModel.update_storage(db_manager.session, "id", data.get("product_id"), "amount", new_value)
                 return jsonify("Bill generated."), 200
             else:
-                return jsonify(f"There are not enough reserves in order to place an order."), 400
+                return jsonify(f"There are not enough reserves place an order."), 400
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
