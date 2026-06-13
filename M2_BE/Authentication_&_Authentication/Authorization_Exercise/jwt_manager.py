@@ -23,11 +23,13 @@ class JWT_Manager:
             print("JWT ERROR:", e)
             return None
 
+    @staticmethod
     def import_private_key_file():
         with open("private_key.pem", "r") as file:
             private_key = file.read()
             return private_key
 
+    @staticmethod
     def import_public_key_file():
         with open("public_key.pem", "r") as file:
             public_key = file.read()

@@ -73,7 +73,7 @@ class Bill(Base):
         if filter_column not in allowed_filters:
             raise ValueError(f"Invalid filter column: {filter_column}")
         
-        stmt = select(cls).where(getattr(cls, filter_column) == filter_value).where(cls.user_id == id)
+        stmt = select(cls).where(getattr(cls, filter_column) == filter_value)
         bill = session.scalar(stmt)
 
         if bill is None:

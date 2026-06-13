@@ -1,6 +1,7 @@
 from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from base import Base
+from exceptions import DuplicateRoleError
 
 class Role(Base):
     __tablename__ = "roles"
@@ -29,9 +30,9 @@ class Role(Base):
     def insert_role(cls, session, role):
         existing_role = session.scalar(select(cls).where(cls.role == role))
         if existing_role:
-            return existing_role
-        user = cls(role = role)
-        session.add(user)
+            raise DuplicateRoleError("Duplicate role.")
+        role = cls(role = role)
+        session.add(role)
         session.commit()
         return role
 

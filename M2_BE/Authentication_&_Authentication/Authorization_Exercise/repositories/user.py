@@ -17,15 +17,14 @@ class User(Base):
 
 
     @classmethod
-    def get_user(cls, session, username, password):
-        stmt = select(cls).where(cls.username == username).where(cls.password == password)
+    def get_user_by_id(cls, session, id):
+        stmt = select(cls).where(cls.id == id)
         user = session.scalar(stmt)
         return user
 
-
     @classmethod
-    def get_user_by_id(cls, session, id):
-        stmt = select(cls).where(cls.id == id)
+    def get_user_by_username(cls, session, username):
+        stmt = select(cls).where(cls.username == username)
         user = session.scalar(stmt)
         return user
 
@@ -35,7 +34,8 @@ class User(Base):
         try:
             existing_user = session.scalar(select(cls).where(cls.username == username))
             if existing_user:
-                return existing_user
+                session.rollback()
+                raise DuplicateUsernameError("Duplicate username. Username must be unique.")
             user = cls(username = username, password = password, role_id = role_id)
             session.add(user)
             session.commit()

@@ -10,6 +10,8 @@ from repositories.user import User as UserModel
 from base import Base
 from exceptions import DuplicateUsernameError
 from parsing import to_dict
+from seed import seed_database
+
 
 app = Flask("user-service")
 db_manager = SqlAlchemyManager("postgresql", "postgres", "postgres", "localhost", "5432", "postgres")
@@ -17,16 +19,30 @@ private_key = JWT_Manager.import_private_key_file()
 public_key = JWT_Manager.import_public_key_file()
 jwt_manager = JWT_Manager(private_key, public_key, "RS256")
 Base.metadata.create_all(db_manager.engine)
-RoleModel.insert_role(db_manager.session, "Admin")
-RoleModel.insert_role(db_manager.session, "Customer")
-UserModel.insert_user(db_manager.session, "Marcelo", "123", 1)
+seed_database(db_manager.session)
 
 class Register(MethodView):
     def post(self):
         try:
+            token = request.headers.get("Authorization")
+            token = token.replace("Bearer ", "")
+            decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
+            role_id = decoded["role_id"]
             data = request.get_json()
+
             if(data.get('username') == None or data.get('password') == None):
                 return Response(status=400)
+            if role_id == 1:
+                result = UserModel.insert_user(db_manager.session, data.get('username'), data.get('password'), data.get("role_id"))
+                user_id = result.id
+                role_id = result.role_id
+                token = jwt_manager.encode({'id':user_id, "role_id":role_id})
+                db_manager.close_connection()
+                return jsonify(token=token), 200
             else:
                 result = UserModel.insert_user(db_manager.session, data.get('username'), data.get('password'), 2)
                 user_id = result.id
@@ -34,6 +50,7 @@ class Register(MethodView):
                 token = jwt_manager.encode({'id':user_id, "role_id":role_id})
                 db_manager.close_connection()
                 return jsonify(token=token), 200
+
         except DuplicateUsernameError as ex:
             return jsonify({"error":str(ex)}), 409
         except ValueError as ex:
@@ -88,6 +105,10 @@ class UserView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             role_id = decoded["role_id"]
             data = request.get_json()
             
@@ -110,6 +131,10 @@ class UserView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             role_id = decoded["role_id"]
             data = request.get_json()
 
@@ -130,16 +155,28 @@ class UserView(MethodView):
 class ProductView(MethodView):
     def get(self):
         try:
-            data = request.get_json()
-            if not data:
-                return Response(status=400)
-            if data.get("id"):
-                product = ProductModel.get_product_by_id(db_manager.session, data.get("id"))
+            token = request.headers.get("Authorization")
+            token = token.replace("Bearer ", "")
+            decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
+            role_id = decoded["role_id"]
+
+            if role_id == 1:
+                data = request.get_json()
+                if not data:
+                    return Response(status=400)
+                if data.get("id"):
+                    product = ProductModel.get_product_by_id(db_manager.session, data.get("id"))
+                    db_manager.close_connection()
+                    return jsonify(to_dict(product)), 200
+                product = ProductModel.get_product(db_manager.session, data.get("name"))
                 db_manager.close_connection()
                 return jsonify(to_dict(product)), 200
-            product = ProductModel.get_product(db_manager.session, data.get("name"))
-            db_manager.close_connection()
-            return jsonify(to_dict(product)), 200
+            else:
+                return jsonify("You do not have the rights to view products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -152,6 +189,10 @@ class ProductView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             role_id = decoded["role_id"]
 
             data = request.get_json()
@@ -173,6 +214,10 @@ class ProductView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             role_id = decoded["role_id"]
 
             data = request.get_json()
@@ -195,6 +240,10 @@ class ProductView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             role_id = decoded["role_id"]
 
             if role_id == 1:
@@ -215,16 +264,28 @@ class ProductView(MethodView):
 class StorageView(MethodView):
     def get(self):
         try:
-            data = request.get_json()
-            if not data:
-                return Response(status=400)
-            if data.get("id"):
-                storage = StorageModel.get_storage_by_id(db_manager.session, data.get("id"))
+            token = request.headers.get("Authorization")
+            token = token.replace("Bearer ", "")
+            decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
+            role_id = decoded["role_id"]
+
+            if role_id == 1:
+                data = request.get_json()
+                if not data:
+                    return Response(status=400)
+                if data.get("id"):
+                    storage = StorageModel.get_storage_by_id(db_manager.session, data.get("id"))
+                    db_manager.close_connection()
+                    return jsonify(to_dict(storage)), 200
+                storage = StorageModel.get_storage(db_manager.session, data.get("product_id"))
                 db_manager.close_connection()
-                return jsonify(to_dict(storage)), 200
-            storage = StorageModel.get_storage(db_manager.session, data.get("product_id"))
-            db_manager.close_connection()
-            return jsonify([to_dict(storage) for storage in storage]), 200
+                return jsonify([to_dict(storage) for storage in storage]), 200
+            else:
+                return jsonify("You do not have the rights to add to view the storage."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -236,6 +297,10 @@ class StorageView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             role_id = decoded["role_id"]
             data = request.get_json()
 
@@ -257,6 +322,10 @@ class StorageView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             role_id = decoded["role_id"]
             data = request.get_json()
 
@@ -279,6 +348,10 @@ class StorageView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             role_id = decoded["role_id"]
             data = request.get_json()
 
@@ -302,18 +375,16 @@ class BillView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
-            user_id = decoded["id"]
+            role_id = decoded["role_id"]
 
             data = request.get_json()
 
-            if data.get("id"):
+            if role_id == 1:
                 bill = BillModel.get_bill_by_id(db_manager.session, data.get("id"))
                 db_manager.close_connection()
                 return jsonify(to_dict(bill)), 200
             else:
-                bill = BillModel.get_bill(db_manager.session, user_id)
-                db_manager.close_connection()
-                return jsonify([to_dict(bill) for bill in bill]), 200
+                return jsonify("You do not have the rights to view bills."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -325,6 +396,10 @@ class BillView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+
+            if decoded is None:
+                return Response(status=401)
+
             user_id = decoded["id"]
             
             data = request.get_json()
@@ -332,7 +407,7 @@ class BillView(MethodView):
             if not data:
                 return Response(status=400)
             
-            storage = StorageModel.get_storage_by_id(db_manager.session, data.get("product_id"))
+            storage = StorageModel.get_storage(db_manager.session, data.get("product_id"))
             storage_availabilty = storage.amount
             new_value = storage_availabilty - data.get("product_amount")
             print(storage_availabilty)
@@ -341,25 +416,11 @@ class BillView(MethodView):
                 StorageModel.update_storage(db_manager.session, "id", data.get("product_id"), "amount", new_value)
                 return jsonify("Bill generated."), 200
             else:
-                return jsonify(f"There are not enough reserves place an order."), 400
+                return jsonify(f"There are not enough reserves to place an order."), 400
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
             print(e)
-            return Response(status=500)
-
-
-    def put(self):
-        try:
-            data = request.get_json()
-            if not data:
-                return Response(status=400)
-            BillModel.update_bill(db_manager.session, data.get("filter_column"), data.get("filter_value"), data.get("update_column"), data.get("new_value"))
-            db_manager.close_connection()
-            return jsonify("Bill updated."), 200
-        except ValueError as ex:
-            return jsonify({"error":str(ex)}), 400
-        except Exception as e:
             return Response(status=500)
 
 
@@ -368,14 +429,21 @@ class BillView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
-            user_id = decoded["id"]
 
-            data = request.get_json()
-            if not data:
-                return Response(status=400)
-            BillModel.delete_bill(db_manager.session, user_id, data.get("filter_column"), data.get("filter_value"))
-            db_manager.close_connection()
-            return Response(status=204)
+            if decoded is None:
+                return Response(status=401)
+
+            role_id = decoded["role_id"]
+
+            if role_id == 1:
+                data = request.get_json()
+                if not data:
+                    return Response(status=400)
+                BillModel.delete_bill(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+                db_manager.close_connection()
+                return Response(status=204)
+            else:
+                return jsonify("You do not have the rights to delete a bill."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception:
