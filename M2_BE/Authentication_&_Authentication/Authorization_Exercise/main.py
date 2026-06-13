@@ -410,7 +410,6 @@ class BillView(MethodView):
             storage = StorageModel.get_storage(db_manager.session, data.get("product_id"))
             storage_availabilty = storage.amount
             new_value = storage_availabilty - data.get("product_amount")
-            print(storage_availabilty)
             if data.get("product_amount") <= storage_availabilty:
                 BillModel.insert_bill(db_manager.session, user_id, data.get("product_id"), data.get("product_amount"))
                 StorageModel.update_storage(db_manager.session, "id", data.get("product_id"), "amount", new_value)
