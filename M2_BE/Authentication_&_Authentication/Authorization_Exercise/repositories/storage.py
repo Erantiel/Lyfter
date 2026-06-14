@@ -17,9 +17,9 @@ class Storage(Base):
 
 
     @classmethod
-    def get_storage(cls, session, product_id):
+    def get_storage_by_product_id(cls, session, product_id):
         stmt = select(cls).where(cls.product_id == product_id)
-        storage = session.scalars(stmt).all()
+        storage = session.scalar(stmt)
         return storage
 
 
@@ -27,6 +27,13 @@ class Storage(Base):
     def get_storage_by_id(cls, session, id):
         stmt = select(cls).where(cls.id == id)
         storage = session.scalar(stmt)
+        return storage
+
+
+    @classmethod
+    def get_storage(cls, session):
+        stmt = select(cls)
+        storage = session.scalars(stmt).all()
         return storage
 
 

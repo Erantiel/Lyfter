@@ -90,6 +90,8 @@ class Me(MethodView):
                 test = token.replace("Bearer ","")
                 decoded = jwt_manager.decode(test)
                 user_id = decoded['id']
+                if decoded is None:
+                    return Response(status=401)
                 user = UserModel.get_user_by_id(db_manager.session, user_id)
                 db_manager.close_connection()
                 return jsonify(id=user_id, username=user.username)
@@ -281,9 +283,10 @@ class StorageView(MethodView):
                     storage = StorageModel.get_storage_by_id(db_manager.session, data.get("id"))
                     db_manager.close_connection()
                     return jsonify(to_dict(storage)), 200
-                storage = StorageModel.get_storage(db_manager.session, data.get("product_id"))
-                db_manager.close_connection()
-                return jsonify([to_dict(storage) for storage in storage]), 200
+                else:
+                    storage = StorageModel.get_storage(db_manager.session)
+                    db_manager.close_connection()
+                    return jsonify([to_dict(storage) for storage in storage]), 200
             else:
                 return jsonify("You do not have the rights to add to view the storage."), 403
         except ValueError as ex:
@@ -375,16 +378,27 @@ class BillView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+            user_id = decoded["id"]
             role_id = decoded["role_id"]
+
+            if decoded is None:
+                return Response(status=401)
 
             data = request.get_json()
 
             if role_id == 1:
-                bill = BillModel.get_bill_by_id(db_manager.session, data.get("id"))
+                if data.get("id"):
+                    bill = BillModel.get_bill_by_id(db_manager.session, data.get("id"))
+                    db_manager.close_connection()
+                    return jsonify(to_dict(bill)), 200
+                else:
+                    bills = BillModel.get_bills(db_manager.session)
+                    db_manager.close_connection()
+                    return jsonify([to_dict(bills) for bills in bills]), 200
+            elif role_id == 2:
+                bill = BillModel.get_bills_by_user_id(db_manager.session, user_id)
                 db_manager.close_connection()
-                return jsonify(to_dict(bill)), 200
-            else:
-                return jsonify("You do not have the rights to view bills."), 403
+                return jsonify([to_dict(bills) for bills in bills]), 200
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
@@ -407,7 +421,7 @@ class BillView(MethodView):
             if not data:
                 return Response(status=400)
             
-            storage = StorageModel.get_storage(db_manager.session, data.get("product_id"))
+            storage = StorageModel.get_storage_by_product_id(db_manager.session, data.get("product_id"))
             storage_availabilty = storage.amount
             new_value = storage_availabilty - data.get("product_amount")
             if data.get("product_amount") <= storage_availabilty:

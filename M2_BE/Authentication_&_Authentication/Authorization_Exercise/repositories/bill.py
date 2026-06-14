@@ -19,12 +19,17 @@ class Bill(Base):
     user_relation = relationship("User", back_populates="bill_relation")
     product_relation = relationship("Product", back_populates="bill_relation")
 
+    @classmethod
+    def get_bills(cls, session):
+        stmt = select(cls)
+        bills = session.scalars(stmt).all()
+        return bills
 
     @classmethod
-    def get_bill(cls, session, user_id):
+    def get_bills_by_user_id(cls, session, user_id):
         stmt = select(cls).where(cls.user_id == user_id)
-        bill = session.scalars(stmt).all()
-        return bill
+        bills = session.scalars(stmt).all()
+        return bills
 
 
     @classmethod
@@ -66,7 +71,7 @@ class Bill(Base):
 
 
     @classmethod
-    def delete_bill(cls, session, id, filter_column, filter_value):
+    def delete_bill(cls, session, filter_column, filter_value):
 
         allowed_filters = cls.__table__.columns.keys()
         
