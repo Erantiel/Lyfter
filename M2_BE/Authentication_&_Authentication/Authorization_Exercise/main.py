@@ -89,9 +89,9 @@ class Me(MethodView):
             if(token is not None):
                 test = token.replace("Bearer ","")
                 decoded = jwt_manager.decode(test)
-                user_id = decoded['id']
                 if decoded is None:
                     return Response(status=401)
+                user_id = decoded['id']
                 user = UserModel.get_user_by_id(db_manager.session, user_id)
                 db_manager.close_connection()
                 return jsonify(id=user_id, username=user.username)
@@ -378,11 +378,12 @@ class BillView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
-            user_id = decoded["id"]
-            role_id = decoded["role_id"]
 
             if decoded is None:
                 return Response(status=401)
+
+            user_id = decoded["id"]
+            role_id = decoded["role_id"]
 
             data = request.get_json()
 
@@ -422,6 +423,10 @@ class BillView(MethodView):
                 return Response(status=400)
             
             storage = StorageModel.get_storage_by_product_id(db_manager.session, data.get("product_id"))
+
+            if storage is None:
+                return Response(status=404)
+
             storage_availabilty = storage.amount
             new_value = storage_availabilty - data.get("product_amount")
             if data.get("product_amount") <= storage_availabilty:

@@ -1,7 +1,6 @@
 from sqlalchemy import ForeignKey, Date, String, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 from base import Base
 from repositories.product import Product
 

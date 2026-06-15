@@ -1,4 +1,4 @@
-from sqlalchemy import String, insert, select, update, ForeignKey
+from sqlalchemy import String, select, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.exc import IntegrityError
 from base import Base
