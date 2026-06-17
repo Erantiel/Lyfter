@@ -385,9 +385,10 @@ class BillView(MethodView):
             user_id = decoded["id"]
             role_id = decoded["role_id"]
 
-            data = request.get_json()
-
             if role_id == 1:
+                data = request.get_json()
+                if not data:
+                    return Response(status=400)
                 if data.get("id"):
                     bill = BillModel.get_bill_by_id(db_manager.session, data.get("id"))
                     db_manager.close_connection()

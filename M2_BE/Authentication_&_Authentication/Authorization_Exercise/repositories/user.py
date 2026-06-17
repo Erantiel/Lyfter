@@ -27,6 +27,12 @@ class User(Base):
         stmt = select(cls).where(cls.username == username)
         user = session.scalar(stmt)
         return user
+    
+    @classmethod
+    def get_user(cls, session, username, passowrd):
+        stmt = select(cls).where(cls.username == username).where(cls.password == passowrd)
+        user = session.scalar(stmt)
+        return user
 
 
     @classmethod
