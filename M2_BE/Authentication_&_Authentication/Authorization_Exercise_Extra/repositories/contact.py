@@ -64,7 +64,7 @@ class Contact(Base):
         if update_column not in allowed_filters:
             raise ValueError(f"Invalid update column: {update_column}")
         
-        stmt = select(cls).where(getattr(cls, filter_column) == filter_value).where(user_id = user_id)
+        stmt = select(cls).where(getattr(cls, filter_column) == filter_value).where(cls.user_id == user_id)
         contact = session.scalar(stmt)
 
         if contact is None:
@@ -83,7 +83,7 @@ class Contact(Base):
         if filter_column not in allowed_filters:
             raise ValueError(f"Invalid filter column: {filter_column}")
         
-        stmt = select(cls).where(getattr(cls, filter_column) == filter_value).where(user_id = user_id)
+        stmt = select(cls).where(getattr(cls, filter_column) == filter_value).where(cls.user_id == user_id)
         contact = session.scalar(stmt)
 
         if contact is None:

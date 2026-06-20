@@ -14,6 +14,7 @@ from exceptions import DuplicateUsernameError, DuplicatePhoneNumberError
 from parsing import to_dict
 from seed import seed_database
 from faker import Faker
+from werkzeug.exceptions import HTTPException
 
 
 app = Flask("user-service")
@@ -46,18 +47,20 @@ class Register(MethodView):
                 role_id = result.role_id
                 token = jwt_manager.encode({'id':user_id, "role_id":role_id})
                 refresh_token = jwt_manager.encode_refresh_token({'id':user_id, "role_id":role_id})
+                UserModel.update_user(db_manager.session, "id", user_id, "token", token)
                 UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
                 db_manager.close_connection()
-                return jsonify("User registered."), 200
+                return jsonify(token=token), 200
             else:
                 result = UserModel.insert_user(db_manager.session, data.get('username'), data.get('password'), 2)
                 user_id = result.id
                 role_id = result.role_id
                 token = jwt_manager.encode({'id':user_id, "role_id":role_id})
                 refresh_token = jwt_manager.encode_refresh_token({'id':user_id, "role_id":role_id})
+                UserModel.update_user(db_manager.session, "id", user_id, "token", token)
                 UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
                 db_manager.close_connection()
-                return jsonify("User registered."), 200
+                return jsonify(token=token), 200
         except DuplicateUsernameError as ex:
             return jsonify({"error":str(ex)}), 409
         except ValueError as ex:
@@ -73,17 +76,21 @@ class Login(MethodView):
             if(data.get('username') == None or data.get('password') == None):
                 return Response(status=400)
             else:
-                result = UserModel.get_user(db_manager.session, data.get('username'), data.get("password"))
+                result = UserModel.get_user(db_manager.session, data.get("username"), data.get("password"))
                 db_manager.close_connection()
                 if result == None:
-                    failed_login = UserModel.get_user_by_username(db_manager.session, data.get("username"))
-                    LoginHistoryModel.insert_login(db_manager.session, failed_login.id, faker.ipv4(), "Failed.")
-                    return Response(status=403)
+                    user = UserModel.get_user_by_username(db_manager.session, data.get("username"))
+                    if user == None:
+                        return Response(status=404)
+                    else:
+                        LoginHistoryModel.insert_login(db_manager.session, user.id, faker.ipv4(), "Failed.")
+                        return Response(status=401)
                 else:
                     user_id = result.id
                     role_id = result.role_id
                     token = jwt_manager.encode({'id':user_id, "role_id":role_id})
                     refresh_token = jwt_manager.encode_refresh_token({'id':user_id, "role_id":role_id})
+                    UserModel.update_user(db_manager.session, "id", user_id, "token", token)
                     UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
                     LoginHistoryModel.insert_login(db_manager.session, user_id, faker.ipv4(), "Successful.")
                     return jsonify(token=token), 200
@@ -96,13 +103,18 @@ class Login(MethodView):
 class Me(MethodView):
     def get(self):
         try:
-            data = request.get_json()
-            if(data.get('username') == None or data.get('password') == None):
-                return Response(status=400)
-            else:
-                user = UserModel.get_user_by_username(db_manager.session, data.get("username"))
+            token = request.headers.get('Authorization')
+            if(token is not None):
+                test = token.replace("Bearer ","")
+                decoded = jwt_manager.decode(test)
+                if decoded is None:
+                    return Response(status=401)
+                user_id = decoded['id']
+                user = UserModel.get_user_by_id(db_manager.session, user_id)
                 db_manager.close_connection()
-                return jsonify(id=user.id, username=user.username, refresh_token=user.refresh_token)
+                return jsonify(id=user_id, username=user.username)
+            else:
+                return Response(status=403)
         except Exception as ex:
             return jsonify({"error":str(ex)}), 500
 
@@ -582,6 +594,7 @@ class ContactView(MethodView):
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
+            data = request.get_json()
 
             if decoded is None:
                 return Response(status=401)
@@ -592,12 +605,10 @@ class ContactView(MethodView):
             if not data:
                 return Response(status=400)
             elif role_id == 1:
-                data = request.get_json()
                 ContactModel.delete_contact(db_manager.session, data.get("filter_column"), data.get("filter_value"), data.get("user_id"))
                 db_manager.close_connection()
                 return Response(status=204)
             elif role_id == 2:
-                data = request.get_json()
                 ContactModel.delete_contact(db_manager.session, data.get("filter_column"), data.get("filter_value"), user_id)
                 db_manager.close_connection()
                 return Response(status=204)
@@ -610,10 +621,12 @@ class ContactView(MethodView):
 
 
 class RefreshTokenView(MethodView):
-    def post(self):
+    def get(self):
         try:
-            data = request.get_json()
-            refresh_token = data.get("refresh_token")
+            token = request.headers.get("Authorization")
+            token = token.replace("Bearer ", "")
+            user = UserModel.get_user_by_token(db_manager.session, token)
+            refresh_token = user.refresh_token
 
             if not refresh_token:
                 return jsonify({
@@ -633,9 +646,12 @@ class RefreshTokenView(MethodView):
                 }), 401
 
             new_access_token = jwt_manager.encode({
-                "user_id": decoded["id"],
+                "id": decoded.get("id"),
                 "role_id": decoded.get("role_id")
             })
+
+            user_id = user.id
+            UserModel.update_user(db_manager.session, "id", user_id, "token", new_access_token)
 
             return jsonify({"New token": new_access_token}), 200
 
@@ -653,15 +669,26 @@ class LoginHistoryView(MethodView):
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
 
+            try:
+                data = request.get_json()
+            except HTTPException as ex:
+                if ex.code == 415:
+                    data = None
+
             if decoded is None:
                 return Response(status=401)
 
             role_id = decoded["role_id"]
 
             if role_id == 1:
-                    login_history = LoginHistoryModel.get_login_hisory(db_manager.session)
-                    db_manager.close_connection()
-                    return jsonify([to_dict(login_history) for login_history in login_history]), 200
+                    if data is None:
+                        login_history = LoginHistoryModel.get_login_hisory(db_manager.session)
+                        db_manager.close_connection()
+                        return jsonify([to_dict(login_history) for login_history in login_history]), 200
+                    else:
+                        login_history = LoginHistoryModel.get_login_hisory_by_user_id(db_manager.session, data.get("user_id"))
+                        db_manager.close_connection()
+                        return jsonify([to_dict(login_history) for login_history in login_history]), 200
             else:
                 return jsonify("You do not have the rights to view the login history."), 403
         except ValueError as ex:
@@ -690,7 +717,7 @@ app.add_url_rule("/product", methods=["GET", "POST", "PUT", "DELETE"], view_func
 app.add_url_rule("/storage", methods=["GET", "POST", "PUT", "DELETE"], view_func=storage_view)
 app.add_url_rule("/bill", methods=["GET", "POST", "PUT", "DELETE"], view_func=bill_view)
 app.add_url_rule("/contact", methods=["GET", "POST", "PUT", "DELETE"], view_func=contact_view)
-app.add_url_rule("/refresh-token", methods=["POST"], view_func=refresh_token_view)
+app.add_url_rule("/refresh-token", methods=["GET"], view_func=refresh_token_view)
 app.add_url_rule("/login-history", methods=["GET"], view_func=login_history_view)
 
 if __name__ == "__main__":

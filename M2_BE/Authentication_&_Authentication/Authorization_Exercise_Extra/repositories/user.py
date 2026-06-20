@@ -11,6 +11,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str]
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
+    token: Mapped[str] = mapped_column(default="")
     refresh_token: Mapped[str] = mapped_column(default="")
 
     role_relation = relationship("Role", back_populates="user_relation")
@@ -28,6 +29,13 @@ class User(Base):
     @classmethod
     def get_user_by_username(cls, session, username):
         stmt = select(cls).where(cls.username == username)
+        user = session.scalar(stmt)
+        return user
+
+
+    @classmethod
+    def get_user_by_token(cls, session, token):
+        stmt = select(cls).where(cls.token == token)
         user = session.scalar(stmt)
         return user
 
