@@ -42,23 +42,11 @@ class Register(MethodView):
             if(data.get('username') == None or data.get('password') == None):
                 return Response(status=400)
             if role_id == 1:
-                result = UserModel.insert_user(db_manager.session, data.get('username'), data.get('password'), data.get("role_id"))
-                user_id = result.id
-                role_id = result.role_id
-                token = jwt_manager.encode({'id':user_id, "role_id":role_id})
-                refresh_token = jwt_manager.encode_refresh_token({'id':user_id, "role_id":role_id})
-                UserModel.update_user(db_manager.session, "id", user_id, "token", token)
-                UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
+                UserModel.insert_user(db_manager.session, data.get('username'), data.get('password'), data.get("role_id"))
                 db_manager.close_connection()
                 return jsonify("User created."), 200
             else:
-                result = UserModel.insert_user(db_manager.session, data.get('username'), data.get('password'), 2)
-                user_id = result.id
-                role_id = result.role_id
-                token = jwt_manager.encode({'id':user_id, "role_id":role_id})
-                refresh_token = jwt_manager.encode_refresh_token({'id':user_id, "role_id":role_id})
-                UserModel.update_user(db_manager.session, "id", user_id, "token", token)
-                UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
+                UserModel.insert_user(db_manager.session, data.get('username'), data.get('password'), 2)
                 db_manager.close_connection()
                 return jsonify("User created."), 200
         except DuplicateUsernameError as ex:
@@ -84,6 +72,7 @@ class Login(MethodView):
                         return Response(status=404)
                     else:
                         LoginHistoryModel.insert_login(db_manager.session, user.id, faker.ipv4(), "Failed.")
+                        db_manager.close_connection()
                         return Response(status=401)
                 else:
                     user_id = result.id
@@ -93,6 +82,7 @@ class Login(MethodView):
                     UserModel.update_user(db_manager.session, "id", user_id, "token", token)
                     UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
                     LoginHistoryModel.insert_login(db_manager.session, user_id, faker.ipv4(), "Successful.")
+                    db_manager.close_connection()
                     return jsonify(token=token), 200
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
@@ -652,6 +642,7 @@ class RefreshTokenView(MethodView):
 
             user_id = user.id
             UserModel.update_user(db_manager.session, "id", user_id, "token", new_access_token)
+            db_manager.close_connection()
 
             return jsonify({"New token": new_access_token}), 200
 
