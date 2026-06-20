@@ -50,7 +50,7 @@ class Register(MethodView):
                 UserModel.update_user(db_manager.session, "id", user_id, "token", token)
                 UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
                 db_manager.close_connection()
-                return jsonify(token=token), 200
+                return jsonify("User created."), 200
             else:
                 result = UserModel.insert_user(db_manager.session, data.get('username'), data.get('password'), 2)
                 user_id = result.id
@@ -60,7 +60,7 @@ class Register(MethodView):
                 UserModel.update_user(db_manager.session, "id", user_id, "token", token)
                 UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
                 db_manager.close_connection()
-                return jsonify(token=token), 200
+                return jsonify("User created."), 200
         except DuplicateUsernameError as ex:
             return jsonify({"error":str(ex)}), 409
         except ValueError as ex:
