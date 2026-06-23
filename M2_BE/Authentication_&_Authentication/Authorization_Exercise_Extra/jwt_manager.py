@@ -11,7 +11,7 @@ class JWT_Manager:
     def encode(self, data):
         try:
             payload = data.copy()
-            payload["exp"] = datetime.now(timezone.utc) + timedelta(seconds=15)
+            payload["exp"] = datetime.now(timezone.utc) + timedelta(minutes=15)
             encoded = jwt.encode(payload, self.private_key, algorithm=self.algorithm)
             return encoded
         except jwt.ExpiredSignatureError:
