@@ -15,6 +15,7 @@ from parsing import to_dict
 from seed import seed_database
 from faker import Faker
 from werkzeug.exceptions import HTTPException
+import jwt
 
 
 app = Flask("user-service")
@@ -79,11 +80,10 @@ class Login(MethodView):
                     role_id = result.role_id
                     token = jwt_manager.encode({'id':user_id, "role_id":role_id})
                     refresh_token = jwt_manager.encode_refresh_token({'id':user_id, "role_id":role_id})
-                    UserModel.update_user(db_manager.session, "id", user_id, "token", token)
                     UserModel.update_user(db_manager.session, "id", user_id, "refresh_token", refresh_token)
                     LoginHistoryModel.insert_login(db_manager.session, user_id, faker.ipv4(), "Successful.")
                     db_manager.close_connection()
-                    return jsonify(token=token), 200
+                    return jsonify(token=token, refresh_token = refresh_token), 200
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as ex:
@@ -611,12 +611,10 @@ class ContactView(MethodView):
 
 
 class RefreshTokenView(MethodView):
-    def get(self):
+    def post(self):
         try:
-            token = request.headers.get("Authorization")
-            token = token.replace("Bearer ", "")
-            user = UserModel.get_user_by_token(db_manager.session, token)
-            refresh_token = user.refresh_token
+            data = request.get_json()
+            refresh_token = data.get("refresh_token")
 
             if not refresh_token:
                 return jsonify({
@@ -639,10 +637,6 @@ class RefreshTokenView(MethodView):
                 "id": decoded.get("id"),
                 "role_id": decoded.get("role_id")
             })
-
-            user_id = user.id
-            UserModel.update_user(db_manager.session, "id", user_id, "token", new_access_token)
-            db_manager.close_connection()
 
             return jsonify({"New token": new_access_token}), 200
 
@@ -685,7 +679,6 @@ class LoginHistoryView(MethodView):
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
-            print(e)
             return Response(status=500)
 
 
@@ -708,7 +701,7 @@ app.add_url_rule("/product", methods=["GET", "POST", "PUT", "DELETE"], view_func
 app.add_url_rule("/storage", methods=["GET", "POST", "PUT", "DELETE"], view_func=storage_view)
 app.add_url_rule("/bill", methods=["GET", "POST", "PUT", "DELETE"], view_func=bill_view)
 app.add_url_rule("/contact", methods=["GET", "POST", "PUT", "DELETE"], view_func=contact_view)
-app.add_url_rule("/refresh-token", methods=["GET"], view_func=refresh_token_view)
+app.add_url_rule("/refresh-token", methods=["POST"], view_func=refresh_token_view)
 app.add_url_rule("/login-history", methods=["GET"], view_func=login_history_view)
 
 if __name__ == "__main__":
