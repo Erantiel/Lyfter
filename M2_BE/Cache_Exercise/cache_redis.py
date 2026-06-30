@@ -17,9 +17,9 @@ class CacheManager:
     def store_data(self, key, value, time_to_live=None):
         try:
             if time_to_live is None:
-                self.redis_client.json().set(key, "$", value)
+                self.redis_client.set(key, value)
             else:
-                self.redis_client.json().set(key, "$", value, ex=time_to_live)
+                self.redis_client.set(key, value, ex=time_to_live)
         except redis.RedisError as error:
             print(f"An error ocurred while storing data in Redis: {error}")
 
@@ -34,21 +34,6 @@ class CacheManager:
         except redis.RedisError as error:
             print(f"An error ocurred while checking a key in Redis: {error}")
             return False, None
-
-
-    def check_json_value(self, json_key, json_key_value):
-        try:
-            for key in self.redis_client.scan_iter(match="id:*"):
-                result = self.redis_client.json().get(key, json_key)
-
-                if result == json_key_value:
-                    ttl = self.redis_client.ttl(key)
-                    return True, key.decode("utf-8"), ttl
-                
-            return False, None, None
-        except redis.RedisError as error:
-            print(f"An error occurred during JSON search: {error}")
-            return False, None, None
 
 
     def get_data(self, key):
