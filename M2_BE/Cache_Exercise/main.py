@@ -12,10 +12,12 @@ from exceptions import DuplicateUsernameError
 from parsing import to_dict
 from seed import seed_database
 from cache_redis import CacheManager
+from werkzeug.exceptions import UnsupportedMediaType
+import json
 
 app = Flask("user-service")
 db_manager = SqlAlchemyManager("postgresql", "postgres", "postgres", "localhost", "5432", "postgres")
-cache_manager = CacheManager("***", 123, "***")
+cache_manager = CacheManager("adventurous-megapure-price-20468.db.redis.io", 15039, "gza1BZbV8Tqku6WMIcupZNsZEuIsGLCl")
 private_key = JWT_Manager.import_private_key_file()
 public_key = JWT_Manager.import_public_key_file()
 jwt_manager = JWT_Manager(private_key, public_key, "RS256")
@@ -171,9 +173,11 @@ class ProductView(MethodView):
                 data = request.get_json()
                 if not data:
                     return Response(status=400)
+                if  not data.get("id") and not data.get("name"):
+                    return jsonify("Invalid body data."), 400
                 if data.get("id"):
-                    key_exist, ttl = cache_manager.check_key(f"id:{data.get("id")}")
-                    if key_exist != False:
+                    key, ttl = cache_manager.check_key(f"id:{data.get("id")}")
+                    if key != False:
                         key_data = cache_manager.get_data(f"id:{data.get("id")}")
                         return jsonify(key_data)
                     else:
@@ -182,12 +186,12 @@ class ProductView(MethodView):
                         if product is None:
                             return Response(status=404)
                         else:
-                            cache_manager.store_data(f"id:{data.get("id")}", to_dict(product))
+                            cache_manager.store_data(f"id:{data.get("id")}", json.dumps(to_dict(product)))
                             return jsonify(to_dict(product)), 200
                 elif data.get("name"):
-                    key_exist, data_returned, ttl  = cache_manager.check_json_value("name", data.get("name"))
-                    if key_exist != False:
-                        key_data = cache_manager.get_data(data_returned)
+                    key, ttl  = cache_manager.check_key(f"name: {data.get("name")}")
+                    if key != False:
+                        key_data = cache_manager.get_data(key)
                         return jsonify(key_data)
                     else:
                         product = ProductModel.get_product_by_name(db_manager.session, data.get("name"))
@@ -195,14 +199,15 @@ class ProductView(MethodView):
                         if product is None:
                             return Response(status=404)
                         else:
-                            cache_manager.store_data(f"id:{product.id}", to_dict(product))
+                            cache_manager.store_data(f"name:{data.get("name")}", json.dumps(to_dict(product)))
                             return jsonify(to_dict(product)), 200
             else:
                 return jsonify("You do not have the rights to view products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception as e:
-            print(e)
             return Response(status=500)
 
 
@@ -221,17 +226,16 @@ class ProductView(MethodView):
             if role_id == 1:
                 if not data:
                     return Response(status=400)
+                if  not data.get("name") and not data.get("price"):
+                    return jsonify("Invalid body data."), 400
                 ProductModel.insert_product(db_manager.session, data.get("name"), data.get("price"))
-                key_exist, data_returned, ttl  = cache_manager.check_json_value("name", data.get("name"))
-                if key_exist != False:
-                        cache_manager.delete_data(data_returned)
-                else:
-                    pass
                 return jsonify("Product created."), 200
             else:
                 return jsonify("You do not have the rights to add products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception as e:
             return Response(status=500)
 
@@ -251,17 +255,23 @@ class ProductView(MethodView):
             if role_id == 1:
                 if not data:
                     return Response(status=400)
+                if  not data.get("filter_column") or not data.get("filter_value") or not data.get("update_column") or not data.get("new_value"):
+                    return jsonify("Invalid body data."), 400
+                print(f"{data.get("filter_column")}{data.get("filter_value")}")
                 ProductModel.update_product(db_manager.session, data.get("filter_column"), data.get("filter_value"), data.get("update_column"), data.get("new_value"))
-                key_exist, data_returned, ttl  = cache_manager.check_json_value(data.get("filter_column"), data.get("filter_value"))
-                if key_exist != False:
-                        cache_manager.delete_data(data_returned)
+                key, ttl  = cache_manager.check_key(f"{data.get("filter_column")}:{data.get("filter_value")}")
+                if key != False:
+                        cache_manager.delete_data(f"{data.get("filter_column")}:{data.get("filter_value")}")
                 db_manager.close_connection()
                 return jsonify("Product updated."), 200
             else:
                 return jsonify("You do not have the rights to update products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception as e:
+            print(e)
             return Response(status=500)
 
 
@@ -280,17 +290,20 @@ class ProductView(MethodView):
                 data = request.get_json()
                 if not data:
                     return Response(status=400)
+                if  not data.get("filter_column") or not data.get("filter_value"):
+                    return jsonify("Invalid body data."), 400
                 ProductModel.delete_product(db_manager.session, data.get("filter_column"), data.get("filter_value"))
-                key_exist, data_returned, ttl  = cache_manager.check_json_value(data.get("filter_column"), data.get("filter_value"))
-                if key_exist != False:
-                        cache_manager.delete_data(data_returned)
+                key, ttl  = cache_manager.check_key(f"{data.get("filter_column")}:{data.get("filter_value")}")
+                if key != False:
+                        cache_manager.delete_data(f"{data.get("filter_column")}:{data.get("filter_value")}")
                 db_manager.close_connection()
                 return Response(status=204)
             else:
                 return jsonify("You do not have the rights to delete products."), 403
         except ValueError as ex:
-            print(ex)
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception:
             return Response(status=500)
 
