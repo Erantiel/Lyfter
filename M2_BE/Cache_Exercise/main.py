@@ -226,7 +226,7 @@ class ProductView(MethodView):
             if role_id == 1:
                 if not data:
                     return Response(status=400)
-                if  not data.get("name") and not data.get("price"):
+                if  not data.get("name") or not data.get("price"):
                     return jsonify("Invalid body data."), 400
                 ProductModel.insert_product(db_manager.session, data.get("name"), data.get("price"))
                 return jsonify("Product created."), 200
