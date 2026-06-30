@@ -36,6 +36,13 @@ class Bill(Base):
 
 
     @classmethod
+    def get_bill_by_user_id (cls, session, user_id):
+        stmt = select(cls).where(cls.user_id == user_id)
+        bill = session.scalar(stmt)
+        return bill
+
+
+    @classmethod
     def insert_bill(cls, session, user_id, final_price):
         bill = cls(user_id = user_id, final_price = final_price)
         session.add(bill)

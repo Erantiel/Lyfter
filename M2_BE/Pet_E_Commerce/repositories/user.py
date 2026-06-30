@@ -1,7 +1,7 @@
 from sqlalchemy import String, select, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from base import Base
-from exceptions import DuplicateUsernameError
+from exceptions import UniqueDataError
 
 class User(Base):
     __tablename__ = "user"
@@ -10,7 +10,7 @@ class User(Base):
     name: Mapped [str] = mapped_column(String(100))
     username: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str]
-    email: Mapped [str] = mapped_column(String(100))
+    email: Mapped [str] = mapped_column(String(100), unique=True)
     role_id: Mapped[int] = mapped_column(ForeignKey("role.id"))
     refresh_token: Mapped[str] = mapped_column(nullable=True, default=None)
 
@@ -49,10 +49,14 @@ class User(Base):
 
     @classmethod
     def insert_user(cls, session, name, username, password, email, role_id):
-        existing_user = session.scalar(select(cls).where(cls.username == username))
-        if existing_user:
+        username = session.scalar(select(cls).where(cls.username == username))
+        email = session.scalar(select(cls).where(cls.email == email))
+        if username:
             session.rollback()
-            raise DuplicateUsernameError("Duplicate username. Username must be unique.")
+            raise UniqueDataError("Already existing username. Username must be unique.")
+        if email:
+            session.rollback()
+            raise UniqueDataError("Already existing email. Email must be unique.")
         user = cls(name = name, username = username, password = password, email = email, role_id = role_id)
         session.add(user)
         session.commit()

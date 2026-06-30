@@ -1,6 +1,7 @@
 from sqlalchemy import String, select, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from base import Base
+from exceptions import UniqueDataError
 
 class Product(Base):
     __tablename__ = "product"
@@ -22,7 +23,7 @@ class Product(Base):
 
 
     @classmethod
-    def get_product(cls, session, name):
+    def get_product_by_name(cls, session, name):
         stmt = select(cls).where(cls.name == name)
         product = session.scalar(stmt)
         return product
@@ -36,8 +37,26 @@ class Product(Base):
 
 
     @classmethod
-    def insert_product(cls, session, name, price):
-        product = cls(name = name, price = price)
+    def get_product_by_sku(cls, session, sku):
+        stmt = select(cls).where(cls.sku == sku)
+        product = session.scalar(stmt)
+        return product
+
+
+    @classmethod
+    def get_products(cls, session, id):
+        stmt = select(cls)
+        product = session.scalars(stmt).all()
+        return product
+
+
+    @classmethod
+    def insert_product(cls, session, sku, name, price, description, category_id, brand_id):
+        sku = session.scalar(select(cls).where(cls.sku == sku))
+        if sku:
+            session.rollback()
+            raise UniqueDataError("Already existing SKU. SKU must be unique.")
+        product = cls(sku = sku, name = name, price = price, description = description, category_id = category_id, brand_id = brand_id)
         session.add(product)
         session.commit()
         return product

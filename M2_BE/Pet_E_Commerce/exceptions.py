@@ -1,8 +1,2 @@
-class DuplicateUsernameError(Exception):
-    pass
-
-class DuplicateRoleError(Exception):
-    pass
-
-class DuplicatePhoneNumberError(Exception):
+class UniqueDataError(Exception):
     pass
