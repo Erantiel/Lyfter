@@ -17,7 +17,7 @@ import json
 
 app = Flask("user-service")
 db_manager = SqlAlchemyManager("postgresql", "postgres", "postgres", "localhost", "5432", "postgres")
-cache_manager = CacheManager("adventurous-megapure-price-20468.db.redis.io", 15039, "gza1BZbV8Tqku6WMIcupZNsZEuIsGLCl")
+cache_manager = CacheManager("***", 123, "***")
 private_key = JWT_Manager.import_private_key_file()
 public_key = JWT_Manager.import_public_key_file()
 jwt_manager = JWT_Manager(private_key, public_key, "RS256")
