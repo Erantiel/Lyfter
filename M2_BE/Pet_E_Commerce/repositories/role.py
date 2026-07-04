@@ -1,20 +1,27 @@
 from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from base import Base
-from exceptions import DuplicateRoleError
+from exceptions import UniqueDataError
 
 class Role(Base):
     __tablename__ = "role"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    role: Mapped[str] = mapped_column(String(25))
+    name: Mapped[str] = mapped_column(String(25))
 
     user_relation = relationship("User", back_populates="role_relation")
 
 
     @classmethod
-    def get_role(cls, session, role):
-        stmt = select(cls).where(cls.role == role)
+    def get_roles(cls, session, role):
+        stmt = select(cls)
+        role = session.scalars(stmt).all()
+        return role
+
+
+    @classmethod
+    def get_role_by_name(cls, session, name):
+        stmt = select(cls).where(cls.name == name)
         role = session.scalar(stmt)
         return role
 
@@ -27,11 +34,11 @@ class Role(Base):
 
 
     @classmethod
-    def insert_role(cls, session, role):
-        existing_role = session.scalar(select(cls).where(cls.role == role))
+    def insert_role(cls, session, name):
+        existing_role = session.scalar(select(cls).where(cls.name == name))
         if existing_role:
-            raise DuplicateRoleError("Duplicate role.")
-        role = cls(role = role)
+            raise UniqueDataError("Duplicate role.")
+        role = cls(name = name)
         session.add(role)
         session.commit()
         return role

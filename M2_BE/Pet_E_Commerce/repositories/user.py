@@ -49,12 +49,12 @@ class User(Base):
 
     @classmethod
     def insert_user(cls, session, name, username, password, email, role_id):
-        username = session.scalar(select(cls).where(cls.username == username))
-        email = session.scalar(select(cls).where(cls.email == email))
-        if username:
+        username_exist = session.scalar(select(cls).where(cls.username == username))
+        email_exist = session.scalar(select(cls).where(cls.email == email))
+        if username_exist:
             session.rollback()
             raise UniqueDataError("Already existing username. Username must be unique.")
-        if email:
+        if email_exist:
             session.rollback()
             raise UniqueDataError("Already existing email. Email must be unique.")
         user = cls(name = name, username = username, password = password, email = email, role_id = role_id)

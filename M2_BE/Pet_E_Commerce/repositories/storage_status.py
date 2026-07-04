@@ -26,6 +26,13 @@ class StorageStatus(Base):
 
 
     @classmethod
+    def get_storage_statuses(cls, session):
+        stmt = select(cls)
+        storage_status = session.scalars(stmt).all()
+        return storage_status
+
+
+    @classmethod
     def insert_storage_status(cls, session, name):
         storage_status = cls(name = name)
         session.add(storage_status)

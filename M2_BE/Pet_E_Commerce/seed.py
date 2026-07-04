@@ -4,8 +4,8 @@ from repositories.user import User as UserModel
 
 def seed_database(session):
 
-    admin = RoleModel.get_role(session, "Admin")
-    customer = RoleModel.get_role(session, "Customer")
+    admin = RoleModel.get_role_by_name(session, "Admin")
+    customer = RoleModel.get_role_by_name(session, "Customer")
     user = UserModel.get_user_by_name(session, "Marcelo")
 
     if admin is None:
@@ -21,5 +21,4 @@ def seed_database(session):
             "alfaom@gmail.com",
             admin.id
         )
-    
-    print("Seed created.")
+        print("Seed created.")

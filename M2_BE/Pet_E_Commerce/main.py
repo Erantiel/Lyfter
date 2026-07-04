@@ -75,6 +75,7 @@ class LoginView(MethodView):
             db_manager.session.rollback()
             return jsonify({"error":str(ex)}), 500
 
+
 class MeView(MethodView):
     @login_required(jwt_manager)
     def get(self):
@@ -179,9 +180,12 @@ class UserView(MethodView):
             
             validate_all_body_data(data, "filter_column", "filter_value")
             
-            UserModel.delete_user(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+            deleted_user = UserModel.delete_user(db_manager.session, data.get("filter_column"), data.get("filter_value"))
             db_manager.close_connection()
-            return Response(status=204)
+            if deleted_user is None:
+                return Response(status=410)
+            else:
+                return Response(status=204)
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except UnsupportedMediaType as ex:
@@ -287,9 +291,12 @@ class ProductView(MethodView):
             
             validate_all_body_data(data, "filter_column", "filter_value")
             
-            ProductModel.delete_product(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+            deleted_product = ProductModel.delete_product(db_manager.session, data.get("filter_column"), data.get("filter_value"))
             db_manager.close_connection()
-            return Response(status=204)
+            if deleted_product is None:
+                return Response(status=410)
+            else:
+                return Response(status=204)
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except UnsupportedMediaType as ex:
@@ -388,9 +395,220 @@ class StorageView(MethodView):
             
             validate_all_body_data(data, "filter_column", "filter_value")
             
-            StorageModel.delete_storage(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+            deleted_storage = StorageModel.delete_storage(db_manager.session, data.get("filter_column"), data.get("filter_value"))
             db_manager.close_connection()
-            return Response(status=204)
+            if deleted_storage is None:
+                return Response(status=410)
+            else:
+                return Response(status=204)
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
+        except Exception as ex:
+            db_manager.session.rollback()
+            return jsonify({"error":str(ex)}), 500
+
+
+class StorageStatusView(MethodView):
+    @login_required(jwt_manager)
+    @admin_only
+    def get(self):
+        try:
+            if request.path.endswith("/all"):
+                storage_statuses = SSModel.get_storage_statuses(db_manager.session)
+                return jsonify([to_dict(storage_statuses) for storage_statuses in storage_statuses])
+            
+            data = request.get_json()
+
+            if not data:
+                return Response(status=400)
+            
+            validate_body_one_field(data, "id", "name")
+
+            if data.get("id"):
+                storage_status = SSModel.get_storage_status_by_id(db_manager.session, data.get("id"))
+                db_manager.close_connection()
+                return jsonify(to_dict(storage_status)), 200
+            elif data.get("name"):
+                storage_status = SSModel.get_storage_status_by_name(db_manager.session, data.get("name"))
+                db_manager.close_connection()
+                return jsonify(to_dict(storage_status)), 200
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
+        except Exception as ex:
+            db_manager.session.rollback()
+            return jsonify({"error":str(ex)}), 500
+
+
+    @login_required(jwt_manager)
+    @admin_only
+    def post(self):
+        try:
+            data = request.get_json()
+
+            if not data:
+                return Response(status=400)
+            
+            validate_all_body_data(data, "name")
+            
+            SSModel.insert_storage_status(db_manager.session, data.get("name"))
+            return jsonify("Status added."), 200
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
+        except Exception as ex:
+            db_manager.session.rollback()
+            return jsonify({"error":str(ex)}), 500
+
+
+    @login_required(jwt_manager)
+    @admin_only
+    def put(self):
+        try:
+            data = request.get_json()
+
+            if not data:
+                return Response(status=400)
+            
+            validate_all_body_data(data, "filter_column", "filter_value", "update_column", "new_value")
+            
+            SSModel.update_storage_status(db_manager.session, data.get("filter_column"), data.get("filter_value"), data.get("update_column"), data.get("new_value"))
+            db_manager.close_connection()
+            return jsonify("Status updated."), 200
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
+        except Exception as ex:
+            db_manager.session.rollback()
+            return jsonify({"error":str(ex)}), 500
+
+
+    @login_required(jwt_manager)
+    @admin_only
+    def delete(self):
+        try:
+            data = request.get_json()
+
+            if not data:
+                return Response(status=400)
+            
+            validate_all_body_data(data, "filter_column", "filter_value")
+            
+            deleted_status = SSModel.delete_storage_status(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+            db_manager.close_connection()
+            if deleted_status is None:
+                return Response(status=410)
+            else:
+                return Response(status=204)
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
+        except Exception as ex:
+            db_manager.session.rollback()
+            return jsonify({"error":str(ex)}), 500
+
+
+class RoleView(MethodView):
+    @login_required(jwt_manager)
+    @admin_only
+    def get(self):
+        try:
+            if request.path.endswith("/all"):
+                roles = RoleModel.get_roles(db_manager.session)
+                return jsonify([to_dict(roles) for roles in roles])
+            
+            data = request.get_json()
+
+            if not data:
+                return Response(status=400)
+            
+            validate_body_one_field(data, "id", "name")
+
+            if data.get("id"):
+                role = RoleModel.get_role_by_id(db_manager.session, data.get("id"))
+                db_manager.close_connection()
+                return jsonify(to_dict(role)), 200
+            elif data.get("name"):
+                role = RoleModel.get_role_by_name(db_manager.session, data.get("name"))
+                db_manager.close_connection()
+                return jsonify(to_dict(role)), 200
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
+        except Exception as ex:
+            db_manager.session.rollback()
+            return jsonify({"error":str(ex)}), 500
+
+
+    @login_required(jwt_manager)
+    @admin_only
+    def post(self):
+        try:
+            data = request.get_json()
+
+            if not data:
+                return Response(status=400)
+            
+            validate_all_body_data(data, "name")
+            
+            RoleModel.insert_role(db_manager.session, data.get("name"))
+            return jsonify("Role added.."), 200
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
+        except Exception as ex:
+            db_manager.session.rollback()
+            return jsonify({"error":str(ex)}), 500
+
+
+    @login_required(jwt_manager)
+    @admin_only
+    def put(self):
+        try:
+            data = request.get_json()
+
+            if not data:
+                return Response(status=400)
+            
+            validate_all_body_data(data, "filter_column", "filter_value", "update_column", "new_value")
+            
+            RoleModel.update_role(db_manager.session, data.get("filter_column"), data.get("filter_value"), data.get("update_column"), data.get("new_value"))
+            db_manager.close_connection()
+            return jsonify("Role updated."), 200
+        except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
+        except Exception as ex:
+            db_manager.session.rollback()
+            return jsonify({"error":str(ex)}), 500
+
+
+    @login_required(jwt_manager)
+    @admin_only
+    def delete(self):
+        try:
+            data = request.get_json()
+
+            if not data:
+                return Response(status=400)
+            
+            validate_all_body_data(data, "filter_column", "filter_value")
+            
+            deleted_role = RoleModel.deleted_role(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+            db_manager.close_connection()
+            if deleted_role is None:
+                return Response(status=410)
+            else:
+                return Response(status=204)
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except UnsupportedMediaType as ex:
@@ -451,9 +669,12 @@ class BillView(MethodView):
             
             validate_all_body_data(data, "filter_column", "filter_value")
             
-            BillModel.delete_bill(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+            deleted_bill = BillModel.delete_bill(db_manager.session, data.get("filter_column"), data.get("filter_value"))
             db_manager.close_connection()
-            return Response(status=204)
+            if deleted_bill is None:
+                return Response(status=410)
+            else:
+                return Response(status=204)
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except UnsupportedMediaType as ex:
@@ -506,6 +727,8 @@ me_view = MeView.as_view("me_view_api")
 user_view = UserView.as_view("user_view_api")
 product_view = ProductView.as_view("product_view_api")
 storage_view = StorageView.as_view("storage_view_api")
+storage_status_view = StorageStatusView.as_view("storage_status_view_api")
+role_view = RoleView.as_view("role_view_api")
 bill_view = BillView.as_view("bill_view.api")
 refresh_token_view = RefreshTokenView.as_view("refresh_token_view.api")
 
@@ -518,6 +741,10 @@ app.add_url_rule("/product", methods=["GET", "POST", "PUT", "DELETE"], view_func
 app.add_url_rule("/product/all", methods=["GET"], view_func=product_view)
 app.add_url_rule("/storage", methods=["GET", "POST", "PUT", "DELETE"], view_func=storage_view)
 app.add_url_rule("/storage/all", methods=["GET"], view_func=storage_view)
+app.add_url_rule("/storage_status", methods=["GET", "POST", "PUT", "DELETE"], view_func=storage_status_view)
+app.add_url_rule("/storage_status/all", methods=["GET"], view_func=storage_status_view)
+app.add_url_rule("/role", methods=["GET", "POST", "PUT", "DELETE"], view_func=role_view)
+app.add_url_rule("/role/all", methods=["GET"], view_func=role_view)
 app.add_url_rule("/bill", methods=["GET", "DELETE"], view_func=bill_view)
 app.add_url_rule("/bil/all", methods=["GET"], view_func=bill_view)
 app.add_url_rule("/refresh-token", methods=["POST"], view_func=refresh_token_view)
