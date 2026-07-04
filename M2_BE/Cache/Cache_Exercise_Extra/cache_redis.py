@@ -23,6 +23,20 @@ class CacheManager:
         except redis.RedisError as error:
             print(f"An error ocurred while storing data in Redis: {error}")
 
+
+    def add_product_key(self, product_id, key, time_to_live=None):
+        try:
+            redis_key = f"product_keys:{product_id}"
+
+            self.redis_client.sadd(redis_key, key)
+
+            if time_to_live is not None:
+                self.redis_client.expire(redis_key, time_to_live)
+
+        except redis.RedisError as error:
+            print(f"An error occurred while adding data in Redis: {error}")
+
+
     def check_key(self, key):
         try:
             key_exists = self.redis_client.exists(key)
@@ -45,6 +59,15 @@ class CacheManager:
                 return None
         except redis.RedisError as error:
             print(f"An error ocurred while retrieving data from Redis: {error}")
+
+
+    def get_product_keys(self, product_id):
+        try:
+            keys = self.redis_client.smembers(f"product_keys:{product_id}")
+            return [key.decode("utf-8") for key in keys]
+        except redis.RedisError as error:
+            print(f"An error ocurred while retreiving data from Redis: {error}")
+
 
     def delete_data(self, key):
         try:

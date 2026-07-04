@@ -17,7 +17,7 @@ import json
 
 app = Flask("user-service")
 db_manager = SqlAlchemyManager("postgresql", "postgres", "postgres", "localhost", "5432", "postgres")
-cache_manager = CacheManager("***", 123, "***")
+cache_manager = CacheManager("adventurous-megapure-price-20468.db.redis.io", 15039, "gza1BZbV8Tqku6WMIcupZNsZEuIsGLCl")
 private_key = JWT_Manager.import_private_key_file()
 public_key = JWT_Manager.import_public_key_file()
 jwt_manager = JWT_Manager(private_key, public_key, "RS256")
@@ -158,13 +158,13 @@ class UserView(MethodView):
 
 
 class ProductView(MethodView):
-    def get(self):
+    def get(self, search=None, value=None):
         try:
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
             decoded = jwt_manager.decode(token)
 
-            if request.path.endswith("/cache_all"):
+            if search == None and value == None:
                 key, ttl = cache_manager.check_key("id:all")
                 if key != False:
                     key_data = cache_manager.get_data("id:all")
@@ -181,36 +181,33 @@ class ProductView(MethodView):
             role_id = decoded["role_id"]
 
             if role_id == 1:
-                data = request.get_json()
-                if not data:
-                    return Response(status=400)
-                if  not data.get("id") and not data.get("name"):
-                    return jsonify("Invalid body data."), 400
-                if data.get("id"):
-                    key, ttl = cache_manager.check_key(f"id:{data.get("id")}")
+                if search == "id":
+                    key, ttl = cache_manager.check_key(f"id:{value}")
                     if key != False:
-                        key_data = cache_manager.get_data(f"id:{data.get("id")}")
-                        return jsonify(key_data, time_to_tive = ttl)
+                        key_data = cache_manager.get_data(f"id:{value}")
+                        return jsonify(data = json.loads(key_data), time_to_tive = ttl)
                     else:
-                        product = ProductModel.get_product_by_id(db_manager.session, data.get("id"))
+                        product = ProductModel.get_product_by_id(db_manager.session, value)
                         db_manager.close_connection()
                         if product is None:
                             return Response(status=404)
                         else:
-                            cache_manager.store_data(f"id:{data.get("id")}", json.dumps(to_dict(product)), 600)
+                            cache_manager.store_data(f"id:{value}", json.dumps(to_dict(product)), 600)
+                            cache_manager.add_product_key(value,f"id:{value}", 600)
                             return jsonify(to_dict(product)), 200
-                elif data.get("name"):
-                    key, ttl  = cache_manager.check_key(f"name: {data.get("name")}")
+                elif search == "name":
+                    key, ttl  = cache_manager.check_key(f"name:{value}")
                     if key != False:
-                        key_data = cache_manager.get_data(key)
-                        return jsonify(key_data, time_to_live = ttl)
+                        key_data = cache_manager.get_data(f"name:{value}")
+                        return jsonify(data = json.loads(key_data), time_to_live = ttl)
                     else:
-                        product = ProductModel.get_product_by_name(db_manager.session, data.get("name"))
+                        product = ProductModel.get_product_by_name(db_manager.session, value)
                         db_manager.close_connection()
                         if product is None:
                             return Response(status=404)
                         else:
-                            cache_manager.store_data(f"name:{data.get("name")}", json.dumps(to_dict(product)), 600)
+                            cache_manager.store_data(f"name:{value}", json.dumps(to_dict(product)), 600)
+                            cache_manager.add_product_key(product.id,f"name:{value}", 600)
                             return jsonify(to_dict(product)), 200
             else:
                 return jsonify("You do not have the rights to view products."), 403
@@ -270,11 +267,13 @@ class ProductView(MethodView):
                     return Response(status=400)
                 if  not data.get("filter_column") or not data.get("filter_value") or not data.get("update_column") or not data.get("new_value"):
                     return jsonify("Invalid body data."), 400
-                print(f"{data.get("filter_column")}{data.get("filter_value")}")
-                ProductModel.update_product(db_manager.session, data.get("filter_column"), data.get("filter_value"), data.get("update_column"), data.get("new_value"))
+                product = ProductModel.update_product(db_manager.session, data.get("filter_column"), data.get("filter_value"), data.get("update_column"), data.get("new_value"))
                 key, ttl  = cache_manager.check_key(f"{data.get("filter_column")}:{data.get("filter_value")}")
                 if key != False:
-                        cache_manager.delete_data(f"{data.get("filter_column")}:{data.get("filter_value")}")
+                        keys = cache_manager.get_product_keys(product.id)
+                        for key in keys:
+                            cache_manager.delete_data(key)
+                        cache_manager.delete_data(f"product_keys:{product.id}")
                         cache_manager.delete_data("id:all")
                 db_manager.close_connection()
                 return jsonify("Product updated."), 200
@@ -306,10 +305,13 @@ class ProductView(MethodView):
                     return Response(status=400)
                 if  not data.get("filter_column") or not data.get("filter_value"):
                     return jsonify("Invalid body data."), 400
-                ProductModel.delete_product(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+                product = ProductModel.delete_product(db_manager.session, data.get("filter_column"), data.get("filter_value"))
                 key, ttl  = cache_manager.check_key(f"{data.get("filter_column")}:{data.get("filter_value")}")
                 if key != False:
-                        cache_manager.delete_data(f"{data.get("filter_column")}:{data.get("filter_value")}")
+                        keys = cache_manager.get_product_keys(product.id)
+                        for key in keys:
+                            cache_manager.delete_data(key)
+                        cache_manager.delete_data(f"product_keys:{product.id}")
                         cache_manager.delete_data("id:all")
                 db_manager.close_connection()
                 return Response(status=204)
@@ -543,7 +545,7 @@ app.add_url_rule("/login", methods=["POST"], view_func=login_view)
 app.add_url_rule("/me", methods=["GET"], view_func=me_view)
 app.add_url_rule("/user", methods=["PUT", "DELETE"], view_func=user_view)
 app.add_url_rule("/product", methods=["GET", "POST", "PUT", "DELETE"], view_func=product_view)
-app.add_url_rule("/product/cache_all", methods=["GET"], view_func=product_view)
+app.add_url_rule("/product/<search>/<value>", methods=["GET"], view_func=product_view)
 app.add_url_rule("/storage", methods=["GET", "POST", "PUT", "DELETE"], view_func=storage_view)
 app.add_url_rule("/bill", methods=["GET", "POST", "PUT", "DELETE"], view_func=bill_view)
 
