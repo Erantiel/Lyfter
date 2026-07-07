@@ -13,11 +13,12 @@ from parsing import to_dict
 from seed import seed_database
 from cache_redis import CacheManager
 from werkzeug.exceptions import UnsupportedMediaType
+from sqlalchemy.exc import DataError
 import json
 
 app = Flask("user-service")
 db_manager = SqlAlchemyManager("postgresql", "postgres", "postgres", "localhost", "5432", "postgres")
-cache_manager = CacheManager("***", 123, "***")
+cache_manager = CacheManager("adventurous-megapure-price-20468.db.redis.io", 15039, "gza1BZbV8Tqku6WMIcupZNsZEuIsGLCl")
 private_key = JWT_Manager.import_private_key_file()
 public_key = JWT_Manager.import_public_key_file()
 jwt_manager = JWT_Manager(private_key, public_key, "RS256")
@@ -56,6 +57,8 @@ class Register(MethodView):
 
         except DuplicateUsernameError as ex:
             return jsonify({"error":str(ex)}), 409
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as ex:
@@ -81,6 +84,8 @@ class Login(MethodView):
                     return jsonify(token=token), 200
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception as ex:
             return jsonify({"error":str(ex)}), 500
 
@@ -127,11 +132,13 @@ class UserView(MethodView):
                 return jsonify("You do not have the rights to edit users."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception as e:
             return Response(status=500)
 
 
-    def delete(self):
+    def delete(self, search=None, value=None):
         try:
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
@@ -141,17 +148,18 @@ class UserView(MethodView):
                 return Response(status=401)
 
             role_id = decoded["role_id"]
-            data = request.get_json()
 
             if role_id == 1:
-                if not data:
+                if search != "id" and search != "name":
                     return Response(status=400)
-                UserModel.delete_user(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+                UserModel.delete_user(db_manager.session, search, value)
                 db_manager.close_connection()
                 return Response(status=204)
             else:
                 return jsonify("You do not have the rights to delete users."), 403
         except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except DataError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
             return Response(status=500)
@@ -185,7 +193,7 @@ class ProductView(MethodView):
                     key, ttl = cache_manager.check_key(f"id:{value}")
                     if key != False:
                         key_data = cache_manager.get_data(f"id:{value}")
-                        return jsonify(data = json.loads(key_data), time_to_tive = ttl)
+                        return jsonify(data = json.loads(key_data), time_to_live = ttl)
                     else:
                         product = ProductModel.get_product_by_id(db_manager.session, value)
                         db_manager.close_connection()
@@ -195,28 +203,13 @@ class ProductView(MethodView):
                             cache_manager.store_data(f"id:{value}", json.dumps(to_dict(product)), 600)
                             cache_manager.add_product_key(value,f"id:{value}", 600)
                             return jsonify(to_dict(product)), 200
-                elif search == "name":
-                    key, ttl  = cache_manager.check_key(f"name:{value}")
-                    if key != False:
-                        key_data = cache_manager.get_data(f"name:{value}")
-                        return jsonify(data = json.loads(key_data), time_to_live = ttl)
-                    else:
-                        product = ProductModel.get_product_by_name(db_manager.session, value)
-                        db_manager.close_connection()
-                        if product is None:
-                            return Response(status=404)
-                        else:
-                            cache_manager.store_data(f"name:{value}", json.dumps(to_dict(product)), 600)
-                            cache_manager.add_product_key(product.id,f"name:{value}", 600)
-                            return jsonify(to_dict(product)), 200
             else:
                 return jsonify("You do not have the rights to view products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
-        except UnsupportedMediaType as ex:
-            return jsonify({"error":str(ex)}), 415
+        except DataError as ex:
+            return jsonify({"error":str(ex)}), 400
         except Exception as e:
-            print(e)
             return Response(status=500)
 
 
@@ -288,7 +281,7 @@ class ProductView(MethodView):
             return Response(status=500)
 
 
-    def delete(self):
+    def delete(self, search=None, value=None):
         try:
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
@@ -300,13 +293,10 @@ class ProductView(MethodView):
             role_id = decoded["role_id"]
 
             if role_id == 1:
-                data = request.get_json()
-                if not data:
-                    return Response(status=400)
-                if  not data.get("filter_column") or not data.get("filter_value"):
-                    return jsonify("Invalid body data."), 400
-                product = ProductModel.delete_product(db_manager.session, data.get("filter_column"), data.get("filter_value"))
-                key, ttl  = cache_manager.check_key(f"{data.get("filter_column")}:{data.get("filter_value")}")
+                if  search != "id" and search != "name":
+                    return jsonify("Invalid parameters."), 400
+                product = ProductModel.delete_product(db_manager.session, search, value)
+                key, ttl  = cache_manager.check_key(f"{search}:{value}")
                 if key != False:
                         keys = cache_manager.get_product_keys(product.id)
                         for key in keys:
@@ -319,6 +309,8 @@ class ProductView(MethodView):
                 return jsonify("You do not have the rights to delete products."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except DataError as ex:
+            return jsonify({"error":str(ex)}), 400
         except UnsupportedMediaType as ex:
             return jsonify({"error":str(ex)}), 415
         except Exception:
@@ -326,7 +318,7 @@ class ProductView(MethodView):
 
 
 class StorageView(MethodView):
-    def get(self):
+    def get(self, search=None, value=None):
         try:
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
@@ -338,20 +330,21 @@ class StorageView(MethodView):
             role_id = decoded["role_id"]
 
             if role_id == 1:
-                data = request.get_json()
-                if not data:
+                if search != "id":
                     return Response(status=400)
-                if data.get("id"):
-                    storage = StorageModel.get_storage_by_id(db_manager.session, data.get("id"))
+                elif search == "id":
+                    storage = StorageModel.get_storage_by_id(db_manager.session, value)
                     db_manager.close_connection()
                     return jsonify(to_dict(storage)), 200
-                else:
+                elif search == None and value == None:
                     storage = StorageModel.get_storage(db_manager.session)
                     db_manager.close_connection()
                     return jsonify([to_dict(storage) for storage in storage]), 200
             else:
                 return jsonify("You do not have the rights to add to view the storage."), 403
         except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except DataError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
             return Response(status=500)
@@ -378,6 +371,8 @@ class StorageView(MethodView):
                 return jsonify("You do not have the rights to add to the storage."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception as e:
             return Response(status=500)
 
@@ -404,11 +399,13 @@ class StorageView(MethodView):
                 return jsonify("You do not have the rights to add update the storage."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception as e:
             return Response(status=500)
 
 
-    def delete(self):
+    def delete(self, search=None, value=None):
         try:
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
@@ -418,24 +415,25 @@ class StorageView(MethodView):
                 return Response(status=401)
 
             role_id = decoded["role_id"]
-            data = request.get_json()
 
             if role_id == 1:
-                if not data:
+                if search != "id" and search != "product_id":
                     return Response(status=400)
-                StorageModel.delete_storage(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+                StorageModel.delete_storage(db_manager.session, search, value)
                 db_manager.close_connection()
                 return Response(status=204)
             else:
                 return jsonify("You do not have the rights to add delete from the storage."), 403
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except DataError as ex:
+            return jsonify({"error":str(ex)}), 400
         except Exception:
             return Response(status=500)
 
 
 class BillView(MethodView):
-    def get(self):
+    def get(self, search=None, value=None):
         try:
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
@@ -449,13 +447,13 @@ class BillView(MethodView):
 
             if role_id == 1:
                 data = request.get_json()
-                if not data:
+                if search!= "id":
                     return Response(status=400)
-                if data.get("id"):
+                if search == "id":
                     bill = BillModel.get_bill_by_id(db_manager.session, data.get("id"))
                     db_manager.close_connection()
                     return jsonify(to_dict(bill)), 200
-                else:
+                elif search == None and value == None:
                     bills = BillModel.get_bills(db_manager.session)
                     db_manager.close_connection()
                     return jsonify([to_dict(bills) for bills in bills]), 200
@@ -464,6 +462,8 @@ class BillView(MethodView):
                 db_manager.close_connection()
                 return jsonify([to_dict(bills) for bills in bills]), 200
         except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except DataError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception as e:
             return Response(status=500)
@@ -500,12 +500,13 @@ class BillView(MethodView):
                 return jsonify(f"There are not enough reserves to place an order."), 400
         except ValueError as ex:
             return jsonify({"error":str(ex)}), 400
+        except UnsupportedMediaType as ex:
+            return jsonify({"error":str(ex)}), 415
         except Exception as e:
-            print(e)
             return Response(status=500)
 
 
-    def delete(self):
+    def delete(self, search=None, value=None):
         try:
             token = request.headers.get("Authorization")
             token = token.replace("Bearer ", "")
@@ -517,15 +518,16 @@ class BillView(MethodView):
             role_id = decoded["role_id"]
 
             if role_id == 1:
-                data = request.get_json()
-                if not data:
+                if search != "id":
                     return Response(status=400)
-                BillModel.delete_bill(db_manager.session, data.get("filter_column"), data.get("filter_value"))
+                BillModel.delete_bill(db_manager.session, search, value)
                 db_manager.close_connection()
                 return Response(status=204)
             else:
                 return jsonify("You do not have the rights to delete a bill."), 403
         except ValueError as ex:
+            return jsonify({"error":str(ex)}), 400
+        except DataError as ex:
             return jsonify({"error":str(ex)}), 400
         except Exception:
             return Response(status=500)
@@ -543,11 +545,14 @@ bill_view = BillView.as_view("bill_view.api")
 app.add_url_rule("/register", methods=["POST"], view_func=register_view)
 app.add_url_rule("/login", methods=["POST"], view_func=login_view)
 app.add_url_rule("/me", methods=["GET"], view_func=me_view)
-app.add_url_rule("/user", methods=["PUT", "DELETE"], view_func=user_view)
-app.add_url_rule("/product", methods=["POST", "PUT", "DELETE"], view_func=product_view)
-app.add_url_rule("/product/<search>/<value>", methods=["GET"], view_func=product_view)
-app.add_url_rule("/storage", methods=["GET", "POST", "PUT", "DELETE"], view_func=storage_view)
-app.add_url_rule("/bill", methods=["GET", "POST", "PUT", "DELETE"], view_func=bill_view)
+app.add_url_rule("/user", methods=["PUT"], view_func=user_view)
+app.add_url_rule("/user/<search>/<value>", methods=["DELETE"], view_func=user_view)
+app.add_url_rule("/product", methods=["POST", "PUT"], view_func=product_view)
+app.add_url_rule("/product/<search>/<value>", methods=["GET", "DELETE"], view_func=product_view)
+app.add_url_rule("/storage", methods=["POST", "PUT"], view_func=storage_view)
+app.add_url_rule("/storage/<search>/<value>", methods=["GET", "DELETE"], view_func=storage_view)
+app.add_url_rule("/bill", methods=["POST", "PUT"], view_func=bill_view)
+app.add_url_rule("/bill/<search>/<value>", methods=["GET", "DELETE"], view_func=bill_view)
 
 if __name__ == "__main__":
     app.run(host="localhost", debug=True, use_reloader=False, port=5000)
